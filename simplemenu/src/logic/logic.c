@@ -9,7 +9,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
-#include </home/bittboy/git/libopk/opk.h>
+#include <opk.h>
 
 #include <sys/ioctl.h>
 #if defined(TARGET_NPG) || defined(TARGET_OD) || defined TARGET_OD_BETA
@@ -364,10 +364,10 @@ void executeCommand(char *emulatorFolder, char *executable,	char *fileToBeExecut
 	}
 
 	if(consoleApp) {
-		execlp("./invoker.dge", "invoker.dge", emulatorFolder, exec,
+		execlp("invoker", "invoker", emulatorFolder, exec,
 				fileToBeExecutedWithFullPath1, NULL);
 	} else {
-		execlp("./invoker.dge", "invoker.dge", emulatorFolder, exec,
+		execlp("invoker", "invoker", emulatorFolder, exec,
 				fileToBeExecutedWithFullPath, NULL);
 	}
 
@@ -834,6 +834,12 @@ int theSectionHasGames(struct MenuSection *section) {
 								desktopCounter++;
 								continue;
 							}
+#elif defined(MIYOOMINI)
+                                                        if(strstr(desktopFiles[desktopCounter].name,"miyoomini")==NULL) {
+                                                                logMessage("WARN", "loadGameList", "Non-miyoomini desktop file found");
+                                                                desktopCounter++;
+                                                                continue;
+                                                        }
 #else
 							if(strstr(desktopFiles[desktopCounter].name,"gcw0")==NULL) {
 								logMessage("WARN", "loadGameList", "Non-OD desktop file found");
@@ -1021,6 +1027,12 @@ void loadGameList(int refresh) {
 									desktopCounter++;
 									continue;
 								}
+#elif defined(MIYOOMINI)
+                                                                if(strstr(desktopFiles[desktopCounter].name,"miyoomini")==NULL) {
+                                                                        logMessage("WARN", "loadGameList", "Non-miyoomini desktop file found");
+                                                                        desktopCounter++;
+                                                                        continue;
+                                                                }
 #else
 								if(strstr(desktopFiles[desktopCounter].name,"gcw0")==NULL) {
 									logMessage("WARN", "loadGameList", "Non-OD desktop file found");

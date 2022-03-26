@@ -264,7 +264,10 @@ void setRGBColorInSection(ini_t *config, char *sectionName, char *valueName, int
 	if (value==NULL) {
 		value = ini_get(config, "DEFAULT", valueName);
 	}
-	setRGBFromHex(sectionValueToBeSet, value);
+	if (value != NULL)
+		setRGBFromHex(sectionValueToBeSet, value);
+	else
+		setRGBFromHex(sectionValueToBeSet, "ffffff");
 }
 
 void setThemeResourceValueInSection(ini_t *config, char *sectionName, char *valueName, char *sectionValueToBeSet) {
@@ -318,10 +321,14 @@ void loadTheme(char *theme) {
 		setThemeResourceValueInSection (themeConfig, menuSections[i].sectionName, "no_art_picture", menuSections[i].noArtPicture);
 		setThemeResourceValueInSection (themeConfig, menuSections[i].sectionName, "background", menuSections[i].background);
 
-		value = ini_get(themeConfig, "GENERAL", "system_w");
+		value = ini_get(themeConfig, "GENERAL", "system_w_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "system_w");
 		systemWidth = atoifgl(value);
 
-		value = ini_get(themeConfig, "GENERAL", "system_h");
+		value = ini_get(themeConfig, "GENERAL", "system_h_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "system_h");
 		systemHeight = atoifgl(value);
 
 		if (menuSections[i].systemLogoSurface!=NULL) {
@@ -384,64 +391,102 @@ void loadTheme(char *theme) {
 			showArt = atoifgl(value);
 		}
 
-		value = ini_get(themeConfig, "GENERAL", "items");
+		value = ini_get(themeConfig, "GENERAL", "items_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "items");
 		itemsPerPage = atoifgl(value);
 
-		value = ini_get(themeConfig, "GENERAL", "items_separation");
+		value = ini_get(themeConfig, "GENERAL", "items_separation_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "items_separation");
 		itemsSeparation = atoifgl(value);
 
 		value = ini_get(themeConfig, "GENERAL", "items_in_fullscreen_mode");
 		itemsPerPageFullscreen = atoifgl(value);
 
-		value = ini_get(themeConfig, "GENERAL", "game_list_alignment");
+		value = ini_get(themeConfig, "GENERAL", "game_list_alignment_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "game_list_alignment");
 		gameListAlignment = atoifgl(value);
 
-		value = ini_get(themeConfig, "GENERAL", "game_list_x");
+		value = ini_get(themeConfig, "GENERAL", "game_list_x_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "game_list_x");
 		gameListX = atoifgl(value);
 
-		value = ini_get(themeConfig, "GENERAL", "game_list_y");
+		value = ini_get(themeConfig, "GENERAL", "game_list_y_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "game_list_y");
 		gameListY = atoifgl(value);
 
-		value = ini_get(themeConfig, "GENERAL", "game_list_w");
+		value = ini_get(themeConfig, "GENERAL", "game_list_w_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "game_list_w");
 		gameListWidth = atoifgl(value);
 
-		value = ini_get(themeConfig, "GENERAL", "game_list_position_in_full");
+		value = ini_get(themeConfig, "GENERAL", "game_list_position_in_full_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "game_list_position_in_full");
 		gameListPositionFullScreen = atoifgl(value);
 
-		value = ini_get(themeConfig, "GENERAL", "art_max_w");
+		value = ini_get(themeConfig, "GENERAL", "art_max_w_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "art_max_w");
 		artWidth = atoifgl(value);
 
-		value = ini_get(themeConfig, "GENERAL", "art_max_h");
+		value = ini_get(themeConfig, "GENERAL", "art_max_h_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "art_max_h");
 		artHeight = atoifgl(value);
 
-		value = ini_get(themeConfig, "GENERAL", "art_x");
+		value = ini_get(themeConfig, "GENERAL", "art_x_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "art_x");
 		artX = atoifgl(value);
 
-		value = ini_get(themeConfig, "GENERAL", "art_y");
+		value = ini_get(themeConfig, "GENERAL", "art_y_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "art_y");
 		artY = atoifgl(value);
 
-		value = ini_get(themeConfig, "GENERAL", "system_x");
+		value = ini_get(themeConfig, "GENERAL", "system_x_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "system_x");
 		systemX = atoifgl(value);
 
-		value = ini_get(themeConfig, "GENERAL", "system_y");
+		value = ini_get(themeConfig, "GENERAL", "system_y_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "system_y");
 		systemY = atoifgl(value);
 
 		value = ini_get(themeConfig, "GENERAL", "font_size");
 		fontSize = atoifgl(value);
 
-		value = ini_get(themeConfig, "GENERAL", "text1_font_size");
-		text1FontSize = atoi (value);
+		value = ini_get(themeConfig, "GENERAL", "text1_font_size_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "text1_font_size");
+		if (value != NULL)
+			text1FontSize = atoi (value);
 
-		value = ini_get(themeConfig, "GENERAL", "text1_x");
-		text1X = atoifgl(value);
+		value = ini_get(themeConfig, "GENERAL", "text1_x_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "text1_x");
+		if (value != NULL) 	// add by trngaje
+			text1X = atoifgl(value);
 
-		value = ini_get(themeConfig, "GENERAL", "text1_y");
+		value = ini_get(themeConfig, "GENERAL", "text1_y_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "text1_y");
 		text1Y = atoifgl(value);
 
-		value = ini_get(themeConfig, "GENERAL", "text1_alignment");
+		value = ini_get(themeConfig, "GENERAL", "text1_alignment_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "text1_alignment");
 		text1Alignment = atoifgl(value);
 
-		setThemeResourceValueInSection (themeConfig, "GENERAL", "textX_font", textXFont);
+		setThemeResourceValueInSection (themeConfig, "GENERAL", "textX_font_custom", textXFont);
+		if (textXFont==NULL || strlen(textXFont) == 0)
+			setThemeResourceValueInSection (themeConfig, "GENERAL", "textX_font", textXFont);
 
 		battX = -1;
 		value = ini_get(themeConfig, "GENERAL", "batt_x");
@@ -497,35 +542,61 @@ void loadTheme(char *theme) {
 			newspaperMode = atoi (value);
 		}
 
-		value = ini_get(themeConfig, "GENERAL", "text2_font_size");
-		text2FontSize = atoi (value);
+		value = ini_get(themeConfig, "GENERAL", "text2_font_size_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "text2_font_size");
+		if (value!=NULL)
+			text2FontSize = atoi (value);
 
-		value = ini_get(themeConfig, "GENERAL", "text2_x");
-		text2X = atoifgl(value);
+		value = ini_get(themeConfig, "GENERAL", "text2_x_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "text2_x");
+		if (value!=NULL)
+			text2X = atoifgl(value);
 
-		value = ini_get(themeConfig, "GENERAL", "text2_y");
-		text2Y = atoifgl(value);
+		value = ini_get(themeConfig, "GENERAL", "text2_y_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "text2_y");
+		if (value!=NULL)
+			text2Y = atoifgl(value);
 
-		value = ini_get(themeConfig, "GENERAL", "text2_alignment");
-		text2Alignment = atoifgl(value);
+		value = ini_get(themeConfig, "GENERAL", "text2_alignment_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "text2_alignment");
+		if (value!=NULL)
+			text2Alignment = atoifgl(value);
 
-		value = ini_get(themeConfig, "GENERAL", "art_text_distance_from_picture");
-		artTextDistanceFromPicture = atoifgl(value);
+		value = ini_get(themeConfig, "GENERAL", "art_text_distance_from_picture_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "art_text_distance_from_picture");
+		if (value!=NULL)
+			artTextDistanceFromPicture = atoifgl(value);
 
-		value = ini_get(themeConfig, "GENERAL", "art_text_line_separation");
-		artTextLineSeparation = atoifgl(value);
+		value = ini_get(themeConfig, "GENERAL", "art_text_line_separation_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "art_text_line_separation");
+		if (value!=NULL)
+			artTextLineSeparation = atoifgl(value);
 
-		value = ini_get(themeConfig, "GENERAL", "art_text_font_size");
-		artTextFontSize = atoifgl(value);
+		value = ini_get(themeConfig, "GENERAL", "art_text_font_size_in_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "art_text_font_size");
+		if (value!=NULL)
+			artTextFontSize = atoifgl(value);
 
-		value = ini_get(themeConfig, "GENERAL", "font_size");
-		baseFont = atoifgl(value);
+		value = ini_get(themeConfig, "GENERAL", "font_size_custom");
+		if (value == NULL)
+			value = ini_get(themeConfig, "GENERAL", "font_size");
+		if (value!=NULL)
+			baseFont = atoifgl(value);
 
 		value = ini_get(themeConfig, "GENERAL", "transparent_shading");
-		transparentShading  = atoifgl(value);
+		if (value!=NULL)
+			transparentShading  = atoifgl(value);
 
 		value = ini_get(themeConfig, "GENERAL", "fullscreen_footer_on_top");
-		footerOnTop = atoifgl(value);
+		if (value!=NULL)
+			footerOnTop = atoifgl(value);
 
 		value = ini_get(themeConfig, menuSections[i].sectionName, "name");
 		if (value!=NULL) {
@@ -1012,13 +1083,13 @@ int loadSections(char *file) {
 		strcpy(value2,value);
 		char* currentExec = strtok(value2,",");
 		while(currentExec!=NULL) {
-			#ifndef TARGET_PC
-			char *tempNameWithoutPath = getNameWithoutPath(currentExec);
-			char *tempPathWithoutName = getRomPath(currentExec);
-			#else
+			#if defined (MIYOOMINI) || defined (TARGET_PC)
 			char *tempNameWithoutPath = malloc(strlen(currentExec)+1);
 			strcpy(tempNameWithoutPath, currentExec);
 			char *tempPathWithoutName = "\0";
+			#else
+			char *tempNameWithoutPath = getNameWithoutPath(currentExec);
+			char *tempPathWithoutName = getRomPath(currentExec);
 			#endif
 
 			menuSections[menuSectionCounter].executables[execCounter]=malloc(strlen(tempNameWithoutPath)+1);
@@ -1149,51 +1220,79 @@ int loadSections(char *file) {
 		showArt = atoifgl(value);
 	}
 
-	value = ini_get(themeConfig, "GENERAL", "items");
+	value = ini_get(themeConfig, "GENERAL", "items_in_custom");
+	if (value == NULL)
+		value = ini_get(themeConfig, "GENERAL", "items");
 	itemsPerPage = atoifgl(value);
 
-	value = ini_get(themeConfig, "GENERAL", "items_separation");
+	value = ini_get(themeConfig, "GENERAL", "items_separation_in_custom");
+	if (value == NULL)
+		value = ini_get(themeConfig, "GENERAL", "items_separation");
 	itemsSeparation = atoifgl(value);
 
 	value = ini_get(themeConfig, "GENERAL", "items_in_fullscreen_mode");
 	itemsPerPageFullscreen = atoifgl(value);
 
-	value = ini_get(themeConfig, "GENERAL", "game_list_alignment");
+	value = ini_get(themeConfig, "GENERAL", "game_list_alignment_in_custom");
+	if (value == NULL)
+		value = ini_get(themeConfig, "GENERAL", "game_list_alignment");
 	gameListAlignment = atoifgl(value);
 
-	value = ini_get(themeConfig, "GENERAL", "game_list_x");
+	value = ini_get(themeConfig, "GENERAL", "game_list_x_in_custom");
+	if (value == NULL)
+		value = ini_get(themeConfig, "GENERAL", "game_list_x");
 	gameListX = atoifgl(value);
 
-	value = ini_get(themeConfig, "GENERAL", "game_list_y");
+	value = ini_get(themeConfig, "GENERAL", "game_list_y_in_custom");
+	if (value == NULL)
+		value = ini_get(themeConfig, "GENERAL", "game_list_y");
 	gameListY = atoifgl(value);
 
-	value = ini_get(themeConfig, "GENERAL", "game_list_w");
+	value = ini_get(themeConfig, "GENERAL", "game_list_w_in_custom");
+	if (value == NULL)
+		value = ini_get(themeConfig, "GENERAL", "game_list_w");
 	gameListWidth = atoifgl(value);
 
-	value = ini_get(themeConfig, "GENERAL", "game_list_position_in_full");
+	value = ini_get(themeConfig, "GENERAL", "game_list_position_in_full_custom");
+	if (value == NULL)
+		value = ini_get(themeConfig, "GENERAL", "game_list_position_in_full");
 	gameListPositionFullScreen = atoifgl(value);
 
 	logMessage("INFO","loadSections","Out2");
 
-	value = ini_get(themeConfig, "GENERAL", "art_max_w");
+	value = ini_get(themeConfig, "GENERAL", "art_max_w_in_custom");
+	if (value == NULL)
+		value = ini_get(themeConfig, "GENERAL", "art_max_w");
 	artWidth = atoifgl(value);
 
-	value = ini_get(themeConfig, "GENERAL", "art_max_h");
+	value = ini_get(themeConfig, "GENERAL", "art_max_h_in_custom");
+	if (value == NULL)
+		value = ini_get(themeConfig, "GENERAL", "art_max_h");
 	artHeight = atoifgl(value);
 
-	value = ini_get(themeConfig, "GENERAL", "art_x");
+	value = ini_get(themeConfig, "GENERAL", "art_x_in_custom");
+	if (value==NULL)
+		value = ini_get(themeConfig, "GENERAL", "art_x");
 	artX = atoifgl(value);
 
-	value = ini_get(themeConfig, "GENERAL", "art_y");
+	value = ini_get(themeConfig, "GENERAL", "art_y_in_custom");
+	if (value==NULL)
+		value = ini_get(themeConfig, "GENERAL", "art_y");
 	artY = atoifgl(value);
 
-	value = ini_get(themeConfig, "GENERAL", "system_x");
+	value = ini_get(themeConfig, "GENERAL", "system_x_in_custom");
+	if (value == NULL)
+		value = ini_get(themeConfig, "GENERAL", "system_x");
 	systemX = atoifgl(value);
 
-	value = ini_get(themeConfig, "GENERAL", "system_y");
+	value = ini_get(themeConfig, "GENERAL", "system_y_in_custom");
+	if (value == NULL)
+		value = ini_get(themeConfig, "GENERAL", "system_y");
 	systemY = atoifgl(value);
 
-	value = ini_get(themeConfig, "GENERAL", "font_size");
+	value = ini_get(themeConfig, "GENERAL", "font_size_custom");
+	if (value==NULL)
+		value = ini_get(themeConfig, "GENERAL", "font_size");
 	fontSize = atoifgl(value);
 
 	value = ini_get(themeConfig, "GENERAL", "text1_font_size");
@@ -1206,18 +1305,26 @@ int loadSections(char *file) {
 		newspaperMode = atoi (value);
 	}
 
-	value = ini_get(themeConfig, "GENERAL", "text1_x");
+	value = ini_get(themeConfig, "GENERAL", "text1_x_in_custom");
+	if (value == NULL)
+		value = ini_get(themeConfig, "GENERAL", "text1_x");
 	text1X = atoifgl(value);
 
-	value = ini_get(themeConfig, "GENERAL", "text1_y");
+	value = ini_get(themeConfig, "GENERAL", "text1_y_in_custom");
+	if (value == NULL)
+		value = ini_get(themeConfig, "GENERAL", "text1_y");
 	text1Y = atoifgl(value);
 
-	value = ini_get(themeConfig, "GENERAL", "text1_alignment");
+	value = ini_get(themeConfig, "GENERAL", "text1_alignment_in_custom");
+	if (value == NULL)
+		value = ini_get(themeConfig, "GENERAL", "text1_alignment");
 	text1Alignment = atoifgl(value);
 
 	logMessage("INFO","loadSections","Out 3");
 
-	setThemeResourceValueInSection (themeConfig, "GENERAL", "textX_font", textXFont);
+	setThemeResourceValueInSection (themeConfig, "GENERAL", "textX_font_custom", textXFont);
+	if ((textXFont==NULL) || (strlen(textXFont) == 0))
+		setThemeResourceValueInSection (themeConfig, "GENERAL", "textX_font", textXFont);
 
 	battX = -1;
 	value = ini_get(themeConfig, "GENERAL", "batt_x");
@@ -1271,26 +1378,40 @@ int loadSections(char *file) {
 		newspaperMode = atoi (value);
 	}
 
-	value = ini_get(themeConfig, "GENERAL", "text2_font_size");
+	value = ini_get(themeConfig, "GENERAL", "text2_font_size_in_custom");
+	if (value == NULL)
+		value = ini_get(themeConfig, "GENERAL", "text2_font_size");
 
 	text2FontSize = atoi (value);
 
-	value = ini_get(themeConfig, "GENERAL", "text2_x");
+	value = ini_get(themeConfig, "GENERAL", "text2_x_in_custom");
+	if (value==NULL)
+		value = ini_get(themeConfig, "GENERAL", "text2_x");
 	text2X = atoifgl(value);
 
-	value = ini_get(themeConfig, "GENERAL", "text2_y");
+	value = ini_get(themeConfig, "GENERAL", "text2_y_in_custom");
+	if (value == NULL)
+		value = ini_get(themeConfig, "GENERAL", "text2_y");
 	text2Y = atoifgl(value);
 
-	value = ini_get(themeConfig, "GENERAL", "text2_alignment");
+	value = ini_get(themeConfig, "GENERAL", "text2_alignment_in_custom");
+	if (value == NULL)
+		value = ini_get(themeConfig, "GENERAL", "text2_alignment");
 	text2Alignment = atoifgl(value);
 
-	value = ini_get(themeConfig, "GENERAL", "art_text_distance_from_picture");
+	value = ini_get(themeConfig, "GENERAL", "art_text_distance_from_picture_in_custom");
+	if (value == NULL)
+		value = ini_get(themeConfig, "GENERAL", "art_text_distance_from_picture");
 	artTextDistanceFromPicture = atoifgl(value);
 
-	value = ini_get(themeConfig, "GENERAL", "art_text_line_separation");
+	value = ini_get(themeConfig, "GENERAL", "art_text_line_separation_in_custom");
+	if (value == NULL)
+		value = ini_get(themeConfig, "GENERAL", "art_text_line_separation");
 	artTextLineSeparation = atoifgl(value);
 
-	value = ini_get(themeConfig, "GENERAL", "art_text_font_size");
+	value = ini_get(themeConfig, "GENERAL", "art_text_font_size_in_custom");
+	if (value == NULL)
+		value = ini_get(themeConfig, "GENERAL", "art_text_font_size");
 	artTextFontSize = atoifgl(value);
 
 	value = ini_get(themeConfig, "GENERAL", "font_size");

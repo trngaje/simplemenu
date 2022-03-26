@@ -1,6 +1,6 @@
 # Software Name
 TARGET = simplemenu
-PLATFORM = PC
+PLATFORM ?= PC
 #PLATFORM = RFW
 #PLATFORM = OD
 #PLATFORM = OD-BETA
@@ -33,13 +33,19 @@ else ifeq ($(PLATFORM), RK3326)
 	CC = /opt/gcw0-toolchain/usr/bin/mipsel-gcw0-linux-uclibc-gcc
 	LINKER = /opt/rk3326-toolchain/usr/bin/arm-buildroot-linux-uclibcgnueabi-gcc
 	CFLAGS = -DTARGET_RK3326 -DUSE_GZIP -Ofast -fdata-sections -ffunction-sections -fno-PIC -flto -Wall -std=gnu99
-	LIBS += -lSDL -lSDL_sound -lSDL_image -lSDL_ttf -lz -lbz2	
+	LIBS += -lSDL -lSDL_sound -lSDL_image -lSDL_ttf -lz -lbz2
+else ifeq ($(PLATFORM), miyoomini)
+$(info miyoomini)
+        CC = arm-linux-gnueabihf-gcc
+        LINKER   = arm-linux-gnueabihf-gcc
+        CFLAGS = -DMIYOOMINI -DLANG_KOR -DUSE_GZIP -Ofast -fdata-sections -ffunction-sections -fPIC -flto -Wall -Wextra -std=gnu99
+        LIBS += -lSDL -lasound -lSDL_image -lSDL_ttf -lpthread -lopk -lini -lz
 else
 	TARGET = simplemenu-x86
 	CC = gcc
 	LINKER   = gcc
-	CFLAGS = -DTARGET_PC -DUSE_GZIP -Ofast -fdata-sections -ffunction-sections -fPIC -flto -Wall -Wextra -std=gnu99
-	LIBS += -lSDL -lasound -lSDL_image -lSDL_ttf -lopk -lz 	
+	CFLAGS = -DTARGET_PC -DLANG_KOR -DUSE_GZIP -Ofast -fdata-sections -ffunction-sections -fPIC -flto -Wall -Wextra -std=gnu99
+	LIBS += -lSDL -lasound -lSDL_image -lSDL_ttf -lopk -lz
 endif
 
 # You can use Ofast too but it can be more prone to bugs, careful.

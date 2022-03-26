@@ -24,6 +24,97 @@ volatile uint32_t *memregs;
 int32_t memdev = 0;
 int oldCPU;
 
+
+#ifdef MIYOOMINI
+typedef struct {
+    int channel_value;
+    int adc_value;
+} SAR_ADC_CONFIG_READ;
+ 
+#define SARADC_IOC_MAGIC                     'a'
+#define IOCTL_SAR_INIT                       _IO(SARADC_IOC_MAGIC, 0)
+#define IOCTL_SAR_SET_CHANNEL_READ_VALUE     _IO(SARADC_IOC_MAGIC, 1)
+
+static SAR_ADC_CONFIG_READ  adcCfg = {0,0};
+static int sar_fd = 0;
+
+static void initADC(void) {
+    sar_fd = open("/dev/sar", O_WRONLY);
+    ioctl(sar_fd, IOCTL_SAR_INIT, NULL);
+}
+
+static int is_charging = 0;
+void checkCharging(void) {
+    int i = 0;
+    FILE *file = fopen("/sys/devices/gpiochip0/gpio/gpio59/value", "r");
+    if (file!=NULL) {
+        fscanf(file, "%i", &i);
+        fclose(file);
+    }
+    is_charging = i;
+}
+
+int percBat = 0;
+int firstLaunch = 1; 
+int countChecks = 0;
+
+static int checkADC(void) {  
+    ioctl(sar_fd, IOCTL_SAR_SET_CHANNEL_READ_VALUE, &adcCfg);
+
+	
+	int old_is_charging = is_charging;
+	checkCharging();
+	
+        char val[3];
+                
+  		int percBatTemp = 0;
+  		if (is_charging == 0){
+			if (adcCfg.adc_value >= 528){
+  				percBatTemp = adcCfg.adc_value-478;
+  			}
+  			else if ((adcCfg.adc_value >= 512) && (adcCfg.adc_value < 528)){
+  				percBatTemp = (int)(adcCfg.adc_value*2.125-1068);		
+  			}
+  			else if ((adcCfg.adc_value >= 480) && (adcCfg.adc_value < 512)){
+  				percBatTemp = (int)(adcCfg.adc_value* 0.51613 - 243.742);		
+  			}
+  			
+  			if ((firstLaunch == 1) || (old_is_charging == 1)){
+        		// Calibration needed at first launch or when the 
+        		// user just unplugged his charger
+        		firstLaunch = 0;
+        		percBat =  percBatTemp;
+        	}
+        	else {
+        		if (percBat>percBatTemp){
+  					percBat--;
+  				}
+  				else if (percBat < percBatTemp){
+  					percBat++;
+  				}        
+        	}
+        	if (percBat<0){
+ 				percBat=0;
+ 			}	
+  			if (percBat>100){
+ 				percBat=100;
+ 			}	
+
+  		}
+  		else {
+  		// The handheld is currently charging
+  		percBat = 500 ;
+  		}
+  
+  		
+
+		
+  		//countChecks ++;
+    //}
+	return percBat;
+}
+#endif
+
 void to_string(char str[], int num)
 {
     int i, rem, len = 0, n;
@@ -117,6 +208,10 @@ void HW_Init()
 	effect_id=Shake_UploadEffect(device, &effect);
 	effect_id1=Shake_UploadEffect(device, &effect1);
 	#endif
+	
+	#ifdef MIYOOMINI
+	initADC();
+	#endif
 	logMessage("INFO","HW_Init","HW Initialized");
 }
 
@@ -178,7 +273,16 @@ int getBatteryLevel() {
 		return 5;
 	}
 	return total;
+#elif defined (MIYOOMINI)	
+	int charge = checkADC();
+	if (charge<=20)		return 1;
+	else if (charge<=40) return 2;
+	else if (charge<=60) return 3;
+	else if (charge<=80) return 4;
+	else if (charge<=100) return 5;
+	else return 6;	
 #else
+/*
 	FILE *f = fopen("/sys/class/power_supply/BAT0/charge_full", "r");
 	int ret = fscanf(f, "%i", &max_voltage);
 	if (ret==-1) {
@@ -194,6 +298,8 @@ int getBatteryLevel() {
 
 	total = (voltage_now*6)/(max_voltage);
 	return total;
+*/
+	return 2;
 #endif
 }
 

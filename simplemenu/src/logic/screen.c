@@ -70,7 +70,7 @@ void drawPictureTextOnScreen(char *buf) {
 		return;
 	}
 	int h = 0;
-	TTF_SizeText(font, buf, NULL, &h);
+	TTF_SizeUTF8(font, buf, NULL, &h);
 	char *temp = malloc(strlen(buf)+2);
 	if(currentSectionNumber!=favoritesSectionNumber) {
 		if (CURRENT_SECTION.currentGameNode->data->preferences.frequency == OC_OC_LOW||CURRENT_SECTION.currentGameNode->data->preferences.frequency == OC_OC_HIGH) {
@@ -163,7 +163,7 @@ void drawGameNumber(char *buf, int x, int y) {
 
 void drawSettingsOptionValueOnScreen(char *value, int position, int txtColor[]) {
 	int retW3=3;
-	TTF_SizeText(settingsfont, (const char *) value, &retW3, NULL);
+	TTF_SizeUTF8(settingsfont, (const char *) value, &retW3, NULL);
 	drawTextOnScreen(settingsfont, NULL, SCREEN_WIDTH-5-retW3, position, value, txtColor, VAlignBottom | HAlignLeft, (int[]){}, 0);
 }
 
@@ -185,7 +185,7 @@ void drawShadedGameNameOnScreenCustom(char *buf, int position){
 
 	int retW = 1;
 	int width=MAGIC_NUMBER;
-	TTF_SizeText(font, (const char *) buf, &retW, NULL);
+	TTF_SizeUTF8(font, (const char *) buf, &retW, NULL);
 	if (transparentShading) {
 		if (retW>width) {
 			drawTextOnScreenMaxWidth(font, outlineFont, gameListX, position, temp, menuSections[currentSectionNumber].bodySelectedTextTextColor, VAlignBottom | hAlign, (int[]){}, 0, retW);
@@ -205,7 +205,7 @@ void drawShadedGameNameOnScreenCustom(char *buf, int position){
 void drawNonShadedGameNameOnScreenCustom(char *buf, int position) {
 	int retW = 1;
 	int width=MAGIC_NUMBER;
-	TTF_SizeText(font, (const char *) buf, &retW, NULL);
+	TTF_SizeUTF8(font, (const char *) buf, &retW, NULL);
 	if (gameListAlignment == 0) {
 		if (retW>width) {
 			drawTextOnScreenMaxWidth(font, outlineFont, gameListX, position, buf, menuSections[currentSectionNumber].menuItemsFontColor, VAlignBottom | HAlignLeft, (int[]){}, 0, retW);
@@ -728,13 +728,13 @@ void showRomPreferences() {
 	drawTextOnScreen(font, NULL, calculateProportionalSizeOrDistance1(6), (SCREEN_HEIGHT/2)-calculateProportionalSizeOrDistance1(28), name, (int[]) {255,255,255}, VAlignMiddle | HAlignLeft, (int[]){}, 0);
 	free(name);
 
-	TTF_SizeText(font, (const char *) "Overclock: " , &textWidth, NULL);
+	TTF_SizeUTF8(font, (const char *) "Overclock: " , &textWidth, NULL);
 	textWidth+=calculateProportionalSizeOrDistance1(2);
 
 	//Frequency option text
 	drawTextOnScreen(font, NULL, (SCREEN_WIDTH/2)-width/2+calculateProportionalSizeOrDistance1(4), (SCREEN_HEIGHT/2)-calculateProportionalSizeOrDistance1(9), "Overclock: ", textColor, VAlignMiddle | HAlignLeft, (int[]){}, 0);
 	//Frequency option value
-#if defined TARGET_OD_BETA || defined TARGET_RFW || defined TARGET_BITTBOY || defined TARGET_PC
+#if defined TARGET_OD_BETA || defined TARGET_RFW || defined TARGET_BITTBOY || defined TARGET_PC  || defined MIYOOMINI
 	if (CURRENT_SECTION.currentGameNode->data->preferences.frequency==OC_OC_LOW || CURRENT_SECTION.currentGameNode->data->preferences.frequency==OC_OC_HIGH) {
 		drawTextOnScreen(font, NULL, (SCREEN_WIDTH/2)-width/2+textWidth+1, (SCREEN_HEIGHT/2)-calculateProportionalSizeOrDistance1(9), "yes", valueColor, VAlignMiddle | HAlignLeft, (int[]){}, 0);
 	} else {
@@ -1200,7 +1200,7 @@ void drawSpecialScreen(char *title, char **options, char** values, char** hints,
 	int selected=0;
 	#if defined TARGET_RFW
 	int max = 9;
-	#elif defined TARGET_OD || defined TARGET_OD_BETA || defined TARGET_PC
+	#elif defined TARGET_OD || defined TARGET_OD_BETA || defined TARGET_PC || defined MIYOOMINI
 	int max = 9;
 	#else
 	int max = 8;
@@ -1257,47 +1257,94 @@ void setupHelpScreen(int page) {
 	switch (page) {
 		case 1:
 			options[0]="A";
+#ifdef LANG_KOR
+			values[0]="선택";
+#else
 			values[0]="Confirm";
-
+#endif
 			options[1]="B";
+
+#ifdef LANG_KOR
+			values[1]="취소/기능";
+#else
 			values[1]="Back/Function key";
+#endif
 
 			options[2]="X";
+#ifdef LANG_KOR
+			values[2]="즐겨찾기 표시";
+#else
 			values[2]="Mark favorite";
+#endif
 
 			options[3]="Y";
+#ifdef LANG_KOR
+			values[3]="즐겨찾기 리스트로 이동";
+#else
 			values[3]="Show/Hide favorites";
+#endif
 
 #if defined TARGET_BITTBOY
 			options[4]="R";
 #else
 			options[4]="R1";
 #endif
+
+#ifdef LANG_KOR
+			values[4]="전체 화면 모드";
+#else
 			values[4]="Fullscreen mode";
-
+#endif
 			options[5]="Select";
+#ifdef LANG_KOR
+			values[5]="게임 옵션";
+#else			
 			values[5]="Game options";
-
+#endif
 			options[6]="Up/Down/Left/Right";
+#ifdef LANG_KOR
+			values[6]="이동";
+#else			
 			values[6]="Scroll";
+#endif
 
 			options[7]="B+Left/Right";
+#ifdef LANG_KOR
+			values[7]="이전/다음 글자";
+#else
 			values[7]="Previous/Next letter";
+#endif		
 
 			options[8]="B+Up/Down";
+#ifdef LANG_KOR
+			values[8]="빠른 검색";
+#else
 			values[8]="Quick switch";
+#endif
 			break;
 		case 2:
 			options[0] = "B+Select";
+#ifdef LANG_KOR
+			values[0] = "임의 선택";
+#else		
 			values[0] = "Random select";
+#endif
 
 			options[1] = "B+X";
+#ifdef LANG_KOR
+			values[1] = "게임 삭제";
+#else
 			values[1] = "Delete game";
+#endif
 			break;
 	}
 
 	char temp[300];
+#ifdef LANG_KOR
+	sprintf(temp,"PAGE %d/2 - 돌아가려면 B를 누르세요", page);
+#else
 	sprintf(temp,"PAGE %d/2 - PRESS B TO RETURN", page);
+#endif
 	hints[0] = temp;
 }
 
@@ -1360,7 +1407,7 @@ void setupSystemSettings() {
 
 	options[4]="Overclocking level";
 
-#if defined TARGET_OD_BETA || defined TARGET_PC
+#if defined TARGET_OD_BETA || defined TARGET_PC || defined MIYOOMINI
 	if (OCValue==OC_OC_LOW) {
 		values[4]="low";
 	} else if (OCValue==OC_OC_HIGH){
@@ -1393,8 +1440,13 @@ void setupSystemSettings() {
 }
 
 void setupSettingsScreen() {
+#ifdef LANG_KOR
+	options[0]="종료 ";
+	hints[0] = "확정은 A - 선택은 LEFT/RIGHT";
+#else
 	options[0]="Session ";
 	hints[0] = "A TO CONFIRM - LEFT/RIGHT TO CHOOSE";
+#endif
 	if (shutDownEnabled) {
 		switch (selectedShutDownOption) {
 			case 0:
@@ -1418,17 +1470,41 @@ void setupSettingsScreen() {
 		}
 	}
 
+#ifdef LANG_KOR
+	options[1]="테마 ";
+#else
 	options[1]="Theme ";
+#endif
 	char *themeName=getNameWithoutPath((themes[activeTheme]));
 	values[1] = themeName;
+#ifdef LANG_KOR
+	hints[1] = "테마를 선택";
+#else
 	hints[1] = "LAUNCHER THEME";
+#endif
 
+#ifdef LANG_KOR
+	options[2]="기본 실행 ";
+#else
 	options[2]="Default launcher ";
+#endif
 	if (shutDownEnabled) {
 		values[2] = "yes";
 	} else {
 		values[2] = "no";
 	}
+#ifdef LANG_KOR
+	hints[2] = "부팅 후 실행";
+
+	options[3]="외형 ";
+	hints[3] = "외형 옵션";
+
+	options[4]="시스템 ";
+	hints[4] = "시스템 옵션";
+
+	options[5]="도움말 ";
+	hints[5] = "이 메뉴를 사용하는 방법";
+#else
 	hints[2] = "LAUNCH AFTER BOOTING";
 
 	options[3]="Appearance ";
@@ -1439,6 +1515,7 @@ void setupSettingsScreen() {
 
 	options[5]="Help ";
 	hints[5] = "HOW TO USE THIS MENU";
+#endif
 }
 
 
@@ -1512,27 +1589,47 @@ void updateScreen(struct Node *node) {
 			case SETTINGS_SCREEN:
 				clearOptionsValuesAndHints();
 				setupSettingsScreen();
+#ifdef LANG_KOR
+				drawSpecialScreen("설정", options, values, hints, 1);
+#else
 				drawSpecialScreen("SETTINGS", options, values, hints, 1);
+#endif
 				break;
 			case HELP_SCREEN_1:
 				clearOptionsValuesAndHints();
 				setupHelpScreen(1);
+#ifdef LANG_KOR
+				drawSpecialScreen("도움말", options, values, hints, 0);
+#else
 				drawSpecialScreen("HELP", options, values, hints, 0);
+#endif
 				break;
 			case HELP_SCREEN_2:
 				clearOptionsValuesAndHints();
 				setupHelpScreen(2);
+#ifdef LANG_KOR
+				drawSpecialScreen("도움말", options, values, hints, 0);
+#else
 				drawSpecialScreen("HELP", options, values, hints, 0);
+#endif
 				break;
 			case APPEARANCE_SETTINGS:
 				clearOptionsValuesAndHints();
 				setupAppearanceSettings();
+#ifdef LANG_KOR
+				drawSpecialScreen("외형", options, values, hints, 1);
+#else
 				drawSpecialScreen("APPEARANCE", options, values, hints, 1);
+#endif
 				break;
 			case SYSTEM_SETTINGS:
 				clearOptionsValuesAndHints();
 				setupSystemSettings();
+#ifdef LANG_KOR
+				drawSpecialScreen("시스템", options, values, hints, 1);
+#else
 				drawSpecialScreen("SYSTEM", options, values, hints, 1);
+#endif
 				break;
 			case CHOOSING_GROUP:
 				showCurrentGroup();

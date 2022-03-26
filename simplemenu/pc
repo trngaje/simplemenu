@@ -2,5 +2,5 @@
 make clean
 make PLATFORM=PC
 cd output
-./simplemenu
-cd ..
+#./simplemenu-x86
+#cd ..
