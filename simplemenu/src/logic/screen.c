@@ -734,7 +734,7 @@ void showRomPreferences() {
 	//Frequency option text
 	drawTextOnScreen(font, NULL, (SCREEN_WIDTH/2)-width/2+calculateProportionalSizeOrDistance1(4), (SCREEN_HEIGHT/2)-calculateProportionalSizeOrDistance1(9), "Overclock: ", textColor, VAlignMiddle | HAlignLeft, (int[]){}, 0);
 	//Frequency option value
-#if defined TARGET_OD_BETA || defined TARGET_RFW || defined TARGET_BITTBOY || defined TARGET_PC  || defined MIYOOMINI
+#if defined TARGET_OD_BETA || defined TARGET_RFW || defined TARGET_BITTBOY || defined TARGET_PC  || defined MIYOOMINI || defined RGNANO || defined FUNKEY
 	if (CURRENT_SECTION.currentGameNode->data->preferences.frequency==OC_OC_LOW || CURRENT_SECTION.currentGameNode->data->preferences.frequency==OC_OC_HIGH) {
 		drawTextOnScreen(font, NULL, (SCREEN_WIDTH/2)-width/2+textWidth+1, (SCREEN_HEIGHT/2)-calculateProportionalSizeOrDistance1(9), "yes", valueColor, VAlignMiddle | HAlignLeft, (int[]){}, 0);
 	} else {
@@ -1200,7 +1200,7 @@ void drawSpecialScreen(char *title, char **options, char** values, char** hints,
 	int selected=0;
 	#if defined TARGET_RFW
 	int max = 9;
-	#elif defined TARGET_OD || defined TARGET_OD_BETA || defined TARGET_PC || defined MIYOOMINI
+	#elif defined TARGET_OD || defined TARGET_OD_BETA || defined TARGET_PC || defined MIYOOMINI || defined RGNANO || defined FUNKEY
 	int max = 9;
 	#else
 	int max = 8;
@@ -1407,7 +1407,7 @@ void setupSystemSettings() {
 
 	options[4]="Overclocking level";
 
-#if defined TARGET_OD_BETA || defined TARGET_PC || defined MIYOOMINI
+#if defined TARGET_OD_BETA || defined TARGET_PC || defined MIYOOMINI || defined RGNANO || defined FUNKEY
 	if (OCValue==OC_OC_LOW) {
 		values[4]="low";
 	} else if (OCValue==OC_OC_HIGH){

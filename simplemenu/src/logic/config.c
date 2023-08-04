@@ -1018,15 +1018,20 @@ void loadSectionGroups() {
 		char *temp1 = getNameWithoutExtension(temp);
 		char *sectionGroupPath = getRomPath(files[i]);
 
+#if 0
 		if (strlen(sectionGroupsFolder)>1) {
 			strcpy(temp3,sectionGroupsFolder);
 		} else {
 			strcpy(temp3,"\0");
 		}
+#endif
+		logMessage("INFO","loadSectionGroups",sectionGroupsFolder);
+		strcpy(temp3,tempString); // add by trngaje
+
 		strcat(temp3,temp1);
 		strcat(temp3,".png");
 		strcpy(sectionGroups[sectionGroupCounter].groupBackground, temp3);
-		logMessage("INFO","loadSectionGroups","Loading group background");
+		logMessage("INFO","loadSectionGroups",temp3);
 		sectionGroups[sectionGroupCounter].groupBackgroundSurface=IMG_Load(sectionGroups[sectionGroupCounter].groupBackground);
 		char *temp2 = toUpper(temp1);
 		strcpy(sectionGroups[sectionGroupCounter].groupName, temp2);
@@ -1083,7 +1088,7 @@ int loadSections(char *file) {
 		strcpy(value2,value);
 		char* currentExec = strtok(value2,",");
 		while(currentExec!=NULL) {
-			#if defined (MIYOOMINI) || defined (TARGET_PC)
+			#if defined (MIYOOMINI) || defined (TARGET_PC) || defined(RGNANO)
 			char *tempNameWithoutPath = malloc(strlen(currentExec)+1);
 			strcpy(tempNameWithoutPath, currentExec);
 			char *tempPathWithoutName = "\0";

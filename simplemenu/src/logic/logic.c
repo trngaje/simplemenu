@@ -364,10 +364,10 @@ void executeCommand(char *emulatorFolder, char *executable,	char *fileToBeExecut
 	}
 
 	if(consoleApp) {
-		execlp("invoker", "invoker", emulatorFolder, exec,
+		execlp("./invoker", "invoker", emulatorFolder, exec,
 				fileToBeExecutedWithFullPath1, NULL);
 	} else {
-		execlp("invoker", "invoker", emulatorFolder, exec,
+		execlp("./invoker", "invoker", emulatorFolder, exec,
 				fileToBeExecutedWithFullPath, NULL);
 	}
 
@@ -840,6 +840,20 @@ int theSectionHasGames(struct MenuSection *section) {
                                                                 desktopCounter++;
                                                                 continue;
                                                         }
+#elif defined(FUNKEY)
+                                                        if(strstr(desktopFiles[desktopCounter].name,"funkey-s")==NULL) {
+                                                                logMessage("WARN", "loadGameList", "Non-unkey-s desktop file found");
+                                                                desktopCounter++;
+                                                                continue;
+                                                        }
+#elif defined(RGNANO)
+                                                        if(strstr(desktopFiles[desktopCounter].name,"anbernic")==NULL) {
+                                                                logMessage("WARN", "loadGameList", "Non-anbernic desktop file found");
+                                                                desktopCounter++;
+                                                                continue;
+                                                        }
+
+
 #else
 							if(strstr(desktopFiles[desktopCounter].name,"gcw0")==NULL) {
 								logMessage("WARN", "loadGameList", "Non-OD desktop file found");
@@ -909,6 +923,7 @@ void loadGameList(int refresh) {
 	if (CURRENT_SECTION.initialized==0||refresh) {
 		logMessage("INFO","loadGameList","No, loading game list");
 		if(getLaunchAtBoot()==NULL) {
+			logMessage("INFO","loadGameList","NULL++");
 			drawLoadingText();
 		}
 		CURRENT_SECTION.initialized=1;
@@ -1030,6 +1045,18 @@ void loadGameList(int refresh) {
 #elif defined(MIYOOMINI)
                                                                 if(strstr(desktopFiles[desktopCounter].name,"miyoomini")==NULL) {
                                                                         logMessage("WARN", "loadGameList", "Non-miyoomini desktop file found");
+                                                                        desktopCounter++;
+                                                                        continue;
+                                                                }
+#elif defined(FUNKEY)
+                                                                if(strstr(desktopFiles[desktopCounter].name,"funkey-s")==NULL) {
+                                                                        logMessage("WARN", "loadGameList", "Non-funkey-s desktop file found");
+                                                                        desktopCounter++;
+                                                                        continue;
+                                                                }																
+#elif defined(RGNANO)
+                                                                if(strstr(desktopFiles[desktopCounter].name,"anbernic")==NULL) {
+                                                                        logMessage("WARN", "loadGameList", "Non-anbernic desktop file found");
                                                                         desktopCounter++;
                                                                         continue;
                                                                 }

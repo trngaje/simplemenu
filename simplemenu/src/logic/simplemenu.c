@@ -261,6 +261,8 @@ void processEvents() {
 	initialSetup(atoi(argv[1]), atoi(argv[2]));
 #elif defined MIYOOMINI
 	initialSetup(640,480);
+#elif defined RGNANO || defined FUNKEY
+	initialSetup(240,240);
 #else
 	initialSetup(320,240);
 #endif

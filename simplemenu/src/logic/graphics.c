@@ -473,8 +473,10 @@ int displayCenteredImageOnScreen(char *fileName, char *fallBackText, int scaleTo
 void initializeDisplay(int w, int h) {
 	int depth=16;
 
-#if defined MIYOOMINI
+#if defined (MIYOOMINI)
 	Uint32 pcflags = SDL_HWSURFACE|SDL_NOFRAME;
+#elif defined (RGNANO) || defined (FUNKEY)
+	Uint32 pcflags = SDL_SWSURFACE|SDL_NOFRAME;	
 #elif defined TARGET_PC
 	Uint32 pcflags = SDL_HWSURFACE|SDL_NOFRAME;
 #else
@@ -523,7 +525,7 @@ void initializeDisplay(int w, int h) {
 	fprintf(fp,"0");
 	fclose(fp);
 #endif
-#if defined(TARGET_PC) || defined(MIYOOMINI)
+#if defined(TARGET_PC) || defined(MIYOOMINI) || defined(RGNANO) || defined(FUNKEY)
 	SCREEN_HEIGHT = h;
 	SCREEN_WIDTH = w;
 	char msg[1000];
@@ -531,6 +533,8 @@ void initializeDisplay(int w, int h) {
 	logMessage("INFO", "initializeDisplay", msg);
 	SCREEN_RATIO = (double)SCREEN_WIDTH/SCREEN_HEIGHT;
 	screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, depth, pcflags);
+	
+	SDL_ShowCursor(SDL_DISABLE); // for rgnano
 #else
 	char res[20];
 	sprintf(res, "resolution: %dx%d", w, h);

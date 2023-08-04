@@ -40,6 +40,18 @@ $(info miyoomini)
         LINKER   = arm-linux-gnueabihf-gcc
         CFLAGS = -DMIYOOMINI -DLANG_KOR -DUSE_GZIP -Ofast -fdata-sections -ffunction-sections -fPIC -flto -Wall -Wextra -std=gnu99
         LIBS += -lSDL -lasound -lSDL_image -lSDL_ttf -lpthread -lopk -lini -lz
+else ifeq ($(PLATFORM), funkey)
+$(info funkey)
+        CC = /opt/FunKey-sdk-2.3.0/bin/arm-funkey-linux-musleabihf-gcc
+        LINKER   = /opt/FunKey-sdk-2.3.0/bin/arm-funkey-linux-musleabihf-gcc
+        CFLAGS = -DFUNKEY -DLANG_KOR -DUSE_GZIP -Ofast -fdata-sections -ffunction-sections -fPIC -flto -Wall -Wextra -std=gnu99
+        LIBS += -lSDL -lasound -lSDL_image -lSDL_ttf -lpthread -lopk -lini -lz
+else ifeq ($(PLATFORM), rgnano)
+$(info rgnano)
+        CC = arm-linux-gnueabihf-gcc
+        LINKER   = arm-linux-gnueabihf-gcc
+        CFLAGS = -DRGNANO -DLANG_KOR -DUSE_GZIP -Ofast -fdata-sections -ffunction-sections -fPIC -flto -Wall -Wextra -std=gnu99 -I/usr/local/include
+        LIBS += -lSDL -lasound -lSDL_image -lSDL_ttf -lpthread -lopk -lini -lz
 else
 	TARGET = simplemenu-x86
 	CC = gcc

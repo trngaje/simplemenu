@@ -281,6 +281,72 @@ int getBatteryLevel() {
 	else if (charge<=80) return 4;
 	else if (charge<=100) return 5;
 	else return 6;	
+#elif defined (RGNANO) || defined (FUNKEY)
+	unsigned long voltage_min = 0, voltage_max = 1;
+	voltage_now = 1;
+	FILE *handle;
+
+	handle = fopen("/sys/class/power_supply/AC0/status", "r");
+	if (handle) {
+		char buf[16];
+
+		buf[sizeof(buf) - 1] = '\0';
+
+		fread(buf, 1, 16, handle);
+		fclose(handle);
+		if (strcmp(buf, "Charging") == 0)
+			return 6;
+	}
+
+	handle = fopen("/sys/class/power_supply/AC0/online", "r");
+	if (handle) {
+		int usbval = 0;
+		fscanf(handle, "%d", &usbval);
+		fclose(handle);
+		if (usbval == 1)
+			return 6;
+	}
+
+	handle = fopen("/sys/class/power_supply/AC0/capacity", "r");
+	if (handle) {
+		int battval = 0;
+		fscanf(handle, "%d", &battval);
+		fclose(handle);
+
+		if (battval>90) return 5;
+		if (battval>70) return 4;
+		if (battval>50) return 3;
+		if (battval>30) return 2;
+		if (battval>10) return 1;
+
+		return 0;
+	}
+
+	/*
+	 * No 'capacity' file in sysfs - Do a dumb approximation of the capacity
+	 * using the current voltage reported and the min/max voltages of the
+	 * battery.
+	 */
+
+	handle = fopen("/sys/class/power_supply/BAT0/voltage_max_design", "r");
+	if (handle) {
+		fscanf(handle, "%lu", &voltage_max);
+		fclose(handle);
+	}
+
+	handle = fopen("/sys/class/power_supply/BAT0/voltage_min_design", "r");
+	if (handle) {
+		fscanf(handle, "%lu", &voltage_min);
+		fclose(handle);
+	}
+
+	handle = fopen("/sys/class/power_supply/BAT0/voltage_now", "r");
+	if (handle) {
+		fscanf(handle, "%lu", &voltage_now);
+		fclose(handle);
+	}
+
+	return (voltage_now - voltage_min) * 6 / (voltage_max - voltage_min);	
 #else
 /*
 	FILE *f = fopen("/sys/class/power_supply/BAT0/charge_full", "r");
