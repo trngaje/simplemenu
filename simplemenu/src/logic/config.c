@@ -5,6 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <dirent.h>
 #include "../headers/definitions.h"
 #include "../headers/globals.h"
 #include "../headers/logic.h"
@@ -14,6 +15,7 @@
 #include "../headers/graphics.h"
 #include "../headers/utils.h"
 #include "../headers/config.h"
+#include "../headers/scripts.h"
 
 char home[5000];
 char pathToThemeConfigFile[1000];
@@ -122,9 +124,13 @@ int isLaunchAtBoot(char *romName) {
 	line[strlen(line)-1] = '\0';
 	if (!strcmp(line,romName)) {
 		fclose(fp);
+		if (line)
+			free(line);
 		return 1;
 	}
 	fclose(fp);
+	if (line)
+		free(line);
 	return 0;
 }
 
@@ -208,6 +214,8 @@ struct AutostartRom *getLaunchAtBoot() {
 	}
 	autostartRom->emulator = strdup(line);
 	fclose(fp);
+	if (line)
+		free(line);
 	return autostartRom;
 }
 
@@ -768,6 +776,10 @@ void loadRomPreferences(struct Rom *rom) {
 	rom->preferences.emulatorDir=atoifgl(configurations[0]);
 	rom->preferences.emulator=atoifgl(configurations[1]);
 	rom->preferences.frequency = atoifgl(configurations[2]);
+	
+	fclose(fp);
+	if (line)
+		free(line);
 }
 
 void saveFavorites() {
@@ -882,6 +894,21 @@ void loadConfig() {
 	value = ini_get(config, "GENERAL", "media_folder");
 	strcpy(mediaFolder,value);
 
+	value = ini_get(config, "GENERAL", "language_file");
+	if (value != NULL)
+		strcpy(languagefile,value);
+	FILE *fp;	
+	if (strlen(languagefile) > 0) {
+		char path_of_languagefile[260];
+		snprintf(path_of_languagefile, sizeof(path_of_languagefile), "%s/.simplemenu/%s.lang", home, languagefile);
+		fp = fopen(path_of_languagefile, "rb");
+	}
+	uistring_init(fp);
+	
+	if (fp != NULL) {
+		fclose(fp);
+	}
+
 	value = ini_get(config, "GENERAL", "logging_enabled");
 
 	if (atoifgl(value)==1) {
@@ -991,8 +1018,19 @@ void loadConfig() {
 		BTN_R = atoifgl(value);
 	}
 
+        value = ini_get(config, "CONTROLS", "POWER");
+        if (value) {
+                BTN_POWER = atoifgl(value);
+        }
+
 	ini_free(config);
 	logMessage("INFO","loadConfig","Config loaded");
+	
+	
+	logMessage("INFO", "loadConfig/languagefile", languagefile);
+	logMessage("INFO", "loadConfig/ui_getstring(0)", ui_getstring(0));
+
+	checkLangfiles(languagefile); // check if *.lang files are exists
 }
 
 void loadSectionGroups() {
@@ -1088,7 +1126,7 @@ int loadSections(char *file) {
 		strcpy(value2,value);
 		char* currentExec = strtok(value2,",");
 		while(currentExec!=NULL) {
-			#if defined (MIYOOMINI) || defined (TARGET_PC) || defined(RGNANO)
+			#if defined (MIYOOMINI) || defined (TARGET_PC) || defined(RGNANO) || defined(FUNKEY)
 			char *tempNameWithoutPath = malloc(strlen(currentExec)+1);
 			strcpy(tempNameWithoutPath, currentExec);
 			char *tempPathWithoutName = "\0";
@@ -1658,4 +1696,43 @@ void loadLastState() {
 		free(line);
 	}
 	logMessage("INFO","loadLastState","Last state loaded");
+}
+
+void checkLangfiles(const char *config_langname) {
+	char tempString[260];
+    DIR *di;
+    char *ptr1,*ptr2;
+    struct dirent *dir;
+
+	num_of_langfiles = 0;
+	activeLang = 0;
+	
+	snprintf(tempString, sizeof(tempString), "%s/.simplemenu", getenv("HOME"));
+    di = opendir(tempString);
+    if (di) {
+        while ((dir = readdir(di)) != NULL) {
+            ptr1=strtok(dir->d_name,".");
+            ptr2=strtok(NULL,".");
+            if(ptr2!=NULL) {
+               if(strcmp(ptr2,"lang") == 0) {
+					langfiles[num_of_langfiles] = malloc(strlen(ptr1) + 1);
+					strcpy(langfiles[num_of_langfiles], ptr1);
+					if (strcmp(ptr1, config_langname) == 0)
+						activeLang = num_of_langfiles;
+					logMessage("INFO", "checkLangfiles/langfiles", langfiles[num_of_langfiles]);
+					num_of_langfiles++;
+                }
+            }
+        }
+        closedir(di);
+    }		
+	
+	snprintf(tempString, sizeof(tempString), "num_of_langfiles=%d, activeLang=%d", num_of_langfiles, activeLang);
+	logMessage("INFO", "checkLangfiles", tempString);
+	logMessage("INFO", "checkLangfiles", "language files checked");
+}
+
+void config_ini_set_value(const char *name, const char *value) {	
+
+
 }

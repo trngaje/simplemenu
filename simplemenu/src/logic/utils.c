@@ -30,13 +30,15 @@ void logMessage(const char* tag, const char* function, const char* message) {
 		}
 		printf("%s | %-5s | %-40s | %s\n", time, tag, function, message);
 		fprintf(fp,"%s | %-5s | %-40s | %s\n", time, tag, function, message);
-
+		
+        closeLogFile();
 	}
 }
 
 void closeLogFile() {
 	if (fp!=NULL) {
 		fclose(fp);
+		fp = NULL;
 	}
 }
 

@@ -38,25 +38,25 @@ else ifeq ($(PLATFORM), miyoomini)
 $(info miyoomini)
         CC = arm-linux-gnueabihf-gcc
         LINKER   = arm-linux-gnueabihf-gcc
-        CFLAGS = -DMIYOOMINI -DLANG_KOR -DUSE_GZIP -Ofast -fdata-sections -ffunction-sections -fPIC -flto -Wall -Wextra -std=gnu99
+        CFLAGS = -DMIYOOMINI -DUSE_GZIP -Ofast -fdata-sections -ffunction-sections -fPIC -flto -Wall -Wextra -std=gnu99
         LIBS += -lSDL -lasound -lSDL_image -lSDL_ttf -lpthread -lopk -lini -lz
 else ifeq ($(PLATFORM), funkey)
 $(info funkey)
         CC = /opt/FunKey-sdk-2.3.0/bin/arm-funkey-linux-musleabihf-gcc
         LINKER   = /opt/FunKey-sdk-2.3.0/bin/arm-funkey-linux-musleabihf-gcc
-        CFLAGS = -DFUNKEY -DLANG_KOR -DUSE_GZIP -Ofast -fdata-sections -ffunction-sections -fPIC -flto -Wall -Wextra -std=gnu99
+        CFLAGS = -DFUNKEY -DUSE_GZIP -Ofast -fdata-sections -ffunction-sections -fPIC -flto -Wall -Wextra -std=gnu99
         LIBS += -lSDL -lasound -lSDL_image -lSDL_ttf -lpthread -lopk -lini -lz
 else ifeq ($(PLATFORM), rgnano)
 $(info rgnano)
         CC = arm-linux-gnueabihf-gcc
         LINKER   = arm-linux-gnueabihf-gcc
-        CFLAGS = -DRGNANO -DLANG_KOR -DUSE_GZIP -Ofast -fdata-sections -ffunction-sections -fPIC -flto -Wall -Wextra -std=gnu99 -I/usr/local/include
+        CFLAGS = -DRGNANO -DUSE_GZIP -Ofast -fdata-sections -ffunction-sections -fPIC -flto -Wall -Wextra -std=gnu99 -I/usr/local/include
         LIBS += -lSDL -lasound -lSDL_image -lSDL_ttf -lpthread -lopk -lini -lz
 else
 	TARGET = simplemenu-x86
 	CC = gcc
 	LINKER   = gcc
-	CFLAGS = -DTARGET_PC -DLANG_KOR -DUSE_GZIP -Ofast -fdata-sections -ffunction-sections -fPIC -flto -Wall -Wextra -std=gnu99
+	CFLAGS = -DTARGET_PC -DUSE_GZIP -Ofast -fdata-sections -ffunction-sections -fPIC -flto -Wall -Wextra -std=gnu99
 	LIBS += -lSDL -lasound -lSDL_image -lSDL_ttf -lopk -lz
 endif
 
@@ -78,35 +78,35 @@ BINDIR   = output
 SOURCES  := $(wildcard $(SRCDIR)/*.c)
 
 ifeq ($(PLATFORM), BITTBOY)
-	SOURCES := $(filter-out src/logic/control_od.c, $(SOURCES))
-	SOURCES := $(filter-out src/logic/control_rfw.c, $(SOURCES))
 	SOURCES := $(filter-out src/logic/system_logic_od.c, $(SOURCES))
-	SOURCES := $(filter-out src/logic/system_logic_rfw.c, $(SOURCES))	
+	SOURCES := $(filter-out src/logic/system_logic_rfw.c, $(SOURCES))
+	SOURCES := $(filter-out src/logic/fk_menu.c, $(SOURCES))
 else ifeq ($(PLATFORM), RFW)
-	SOURCES := $(filter-out src/logic/control_od.c, $(SOURCES))
-	SOURCES := $(filter-out src/logic/control_bittboy.c, $(SOURCES))
 	SOURCES := $(filter-out src/logic/system_logic_od.c, $(SOURCES))
-	SOURCES := $(filter-out src/logic/system_logic_bittboy.c, $(SOURCES))		
+	SOURCES := $(filter-out src/logic/system_logic_bittboy.c, $(SOURCES))
+	SOURCES := $(filter-out src/logic/fk_menu.c, $(SOURCES))
 else ifeq ($(PLATFORM), OD)  
-	SOURCES := $(filter-out src/logic/control_rfw.c, $(SOURCES))
-	SOURCES := $(filter-out src/logic/control_bittboy.c, $(SOURCES))
 	SOURCES := $(filter-out src/logic/system_logic_rfw.c, $(SOURCES))
 	SOURCES := $(filter-out src/logic/system_logic_bittboy.c, $(SOURCES))
+	SOURCES := $(filter-out src/logic/fk_menu.c, $(SOURCES))
 else ifeq ($(PLATFORM), OD-BETA)  
-	SOURCES := $(filter-out src/logic/control_rfw.c, $(SOURCES))
-	SOURCES := $(filter-out src/logic/control_bittboy.c, $(SOURCES))
 	SOURCES := $(filter-out src/logic/system_logic_rfw.c, $(SOURCES))
-	SOURCES := $(filter-out src/logic/system_logic_bittboy.c, $(SOURCES))	
+	SOURCES := $(filter-out src/logic/system_logic_bittboy.c, $(SOURCES))
+	SOURCES := $(filter-out src/logic/fk_menu.c, $(SOURCES))
 else ifeq ($(PLATFORM), NPG)  
-	SOURCES := $(filter-out src/logic/control_rfw.c, $(SOURCES))
-	SOURCES := $(filter-out src/logic/control_bittboy.c, $(SOURCES))
 	SOURCES := $(filter-out src/logic/system_logic_rfw.c, $(SOURCES))
-	SOURCES := $(filter-out src/logic/system_logic_bittboy.c, $(SOURCES))	
+	SOURCES := $(filter-out src/logic/system_logic_bittboy.c, $(SOURCES))
+	SOURCES := $(filter-out src/logic/fk_menu.c, $(SOURCES))
+else ifeq ($(PLATFORM), rgnano)
+	SOURCES := $(filter-out src/logic/system_logic_rfw.c, $(SOURCES))
+	SOURCES := $(filter-out src/logic/system_logic_bittboy.c, $(SOURCES))
+else ifeq ($(PLATFORM), funkey)
+	SOURCES := $(filter-out src/logic/system_logic_rfw.c, $(SOURCES))
+	SOURCES := $(filter-out src/logic/system_logic_bittboy.c, $(SOURCES))
 else
-	SOURCES := $(filter-out src/logic/control_rfw.c, $(SOURCES))
-	SOURCES := $(filter-out src/logic/control_bittboy.c, $(SOURCES))
 	SOURCES := $(filter-out src/logic/system_logic_rfw.c, $(SOURCES))
-	SOURCES := $(filter-out src/logic/system_logic_bittboy.c, $(SOURCES))	
+	SOURCES := $(filter-out src/logic/system_logic_bittboy.c, $(SOURCES))
+	SOURCES := $(filter-out src/logic/fk_menu.c, $(SOURCES))
 endif 
 
 OBJECTS := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)

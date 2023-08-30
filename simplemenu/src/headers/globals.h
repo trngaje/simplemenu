@@ -107,6 +107,7 @@ extern int APPEARANCE_OPTION;
 extern int SYSTEM_OPTION;
 
 extern char mediaFolder[1000];
+extern char languagefile[260];
 extern int stripGames;
 extern int useCache;
 extern int shutDownEnabled;
@@ -335,6 +336,7 @@ extern int BTN_L1;
 extern int BTN_R1;
 extern int BTN_L2;
 extern int BTN_R2;
+extern int BTN_POWER;
 
 #if defined TARGET_OD || defined TARGET_OD_BETA
 extern Shake_Device *device;
@@ -361,5 +363,11 @@ extern int lastMin;
 extern int lastChargeLevel;
 extern pthread_t clockThread;
 extern pthread_mutex_t lock;
+
+/* LANGUAGE */
+extern char *langfiles[260];
+extern int activeLang;
+extern int langChanged;
+extern int num_of_langfiles;
 
 #endif

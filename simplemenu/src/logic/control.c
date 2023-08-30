@@ -21,6 +21,9 @@
 #include "../headers/doubly_linked_rom_list.h"
 #include "../headers/utils.h"
 
+#if defined(RGNANO) || defined(FUNKEY)
+#include "../headers/fk_menu.h"
+#endif
 int switchToGroup;
 
 void scrollUp() {
@@ -582,6 +585,14 @@ void performGroupChoosingAction() {
 		currentState=SETTINGS_SCREEN;
 		return;
 	}
+	
+	if (keys[BTN_POWER]) {
+		if (FK_RunMenu(screen) == MENU_RETURN_EXIT) {
+			running = 0;
+			return;
+		}
+	}
+		
 	if ((!alternateControls&&keys[BTN_UP])||(alternateControls&&keys[BTN_L1])) {
 		if(activeGroup>0) {
 			activeGroup--;
@@ -754,83 +765,88 @@ void performAppearanceSettingsChoosingAction() {
 }
 
 void performSystemSettingsChoosingAction() {
-	VOLUME_OPTION=0;
-	BRIGHTNESS_OPTION=1;
-	SHARPNESS_OPTION=2;
-	SCREEN_TIMEOUT_OPTION=3;
-	OC_OPTION=4;
-	USB_OPTION=5;
+
 	if (keys[BTN_UP]) {
-		if(chosenSetting>0) {
+		if(chosenSetting > 0) {
 			chosenSetting--;
 		} else {
-			chosenSetting=5;
+			chosenSetting = NUM_OF_MENU_SYSTEM_SETTING-1;
 		}
 	} else if (keys[BTN_DOWN]) {
-		if(chosenSetting<5) {
+		if(chosenSetting < NUM_OF_MENU_SYSTEM_SETTING-1) {
 			chosenSetting++;
 		} else {
-			chosenSetting=0;
+			chosenSetting = 0;
 		}
 	} else if (keys[BTN_LEFT]||keys[BTN_RIGHT]) {
-		if (chosenSetting==USB_OPTION) {
+#if !defined(RGNANO) && !defined(FUNKEY)
+		if (chosenSetting==ID_MENU_SYSTEM_SETTING_USB_OPTION) {
 #if defined TARGET_OD || defined TARGET_PC
 			hdmiChanged=1+hdmiChanged*-1;
 #endif
-		} else if (chosenSetting==SCREEN_TIMEOUT_OPTION) {
-			if(!hdmiEnabled) {
+		} else 
+#endif
+			if (chosenSetting==ID_MENU_SYSTEM_SETTING_SCREEN_TIMEOUT_OPTION) {
+				if(!hdmiEnabled) {
+					if (keys[BTN_LEFT]) {
+						if (timeoutValue>0) {
+							timeoutValue-=5;
+						}
+					} else {
+						if (timeoutValue<60) {
+							timeoutValue+=5;
+						}
+					}
+				}
+			} 
+			else if (chosenSetting==ID_MENU_SYSTEM_SETTING_BRIGHTNESS_OPTION) {
 				if (keys[BTN_LEFT]) {
-					if (timeoutValue>0) {
-						timeoutValue-=5;
+					if (brightnessValue>1) {
+						brightnessValue-=1;
 					}
 				} else {
-					if (timeoutValue<60) {
-						timeoutValue+=5;
+					if (brightnessValue<maxBrightnessValue) {
+						brightnessValue+=1;
 					}
 				}
-			}
-		} else if (chosenSetting==BRIGHTNESS_OPTION) {
-			if (keys[BTN_LEFT]) {
-				if (brightnessValue>1) {
-					brightnessValue-=1;
+				setBrightness(brightnessValue);
+			} 
+#if !defined(RGNANO) && !defined(FUNKEY)
+			else if (chosenSetting==ID_MENU_SYSTEM_SETTING_SHARPNESS_OPTION) {
+				if (keys[BTN_LEFT]) {
+					if (sharpnessValue>0) {
+						sharpnessValue-=1;
+					}
+				} else {
+					if (sharpnessValue<32) {
+						sharpnessValue+=1;
+					}
 				}
-			} else {
-				if (brightnessValue<maxBrightnessValue) {
-					brightnessValue+=1;
-				}
-			}
-			setBrightness(brightnessValue);
-		} else if (chosenSetting==SHARPNESS_OPTION) {
-			if (keys[BTN_LEFT]) {
-				if (sharpnessValue>0) {
-					sharpnessValue-=1;
-				}
-			} else {
-				if (sharpnessValue<32) {
-					sharpnessValue+=1;
-				}
-			}
-			char temp[100];
-			sprintf(temp,"SDL_VIDEO_KMSDRM_SCALING_SHARPNESS=%i",sharpnessValue);
-			SDL_putenv(temp);
-//			screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_NOFRAME|SDL_SWSURFACE);
-		} else if (chosenSetting==OC_OPTION) {
+				char temp[100];
+				sprintf(temp,"SDL_VIDEO_KMSDRM_SCALING_SHARPNESS=%i",sharpnessValue);
+				SDL_putenv(temp);
+	//			screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_NOFRAME|SDL_SWSURFACE);
+			} else if (chosenSetting==ID_MENU_SYSTEM_SETTING_OC_OPTION) {
 #if defined TARGET_OD_BETA || defined TARGET_PC
-			if (OCValue==OC_OC_LOW) {
-				OCValue=OC_OC_HIGH;
-			} else {
-				OCValue=OC_OC_LOW;
+				if (OCValue==OC_OC_LOW) {
+					OCValue=OC_OC_HIGH;
+				} else {
+					OCValue=OC_OC_LOW;
+				}
 			}
-		}
 #else
-			OCValue=OC_NO;
-		}
+				OCValue=OC_NO;
+			}
 #endif
-	} else if (chosenSetting==VOLUME_OPTION&&keys[BTN_A]) {
+#endif
+		} 
+#if !defined(RGNANO) && !defined(FUNKEY)
+	else if (chosenSetting==ID_MENU_SYSTEM_SETTING_VOLUME_OPTION && keys[BTN_A]) {
 		if (keys[BTN_A]) {
 			executeCommand ("/usr/bin", "alsamixer", "#", 1, OC_NO);
 		}
-	} else if (chosenSetting==USB_OPTION&&keys[BTN_A]) {
+	} 
+	else if (chosenSetting==ID_MENU_SYSTEM_SETTING_USB_OPTION&&keys[BTN_A]) {
 #if defined TARGET_RFW
 		executeCommand ("./scripts/", "usb_mode_on.sh", "#", 0, OC_NO);
 		hotKeyPressed=0;
@@ -838,34 +854,29 @@ void performSystemSettingsChoosingAction() {
 		selectedShutDownOption=1;
 		running=0;
 #endif
-	} else if (keys[BTN_B]) {
+	} 
+#endif	
+	else if (keys[BTN_B]) {
 		chosenSetting=previouslyChosenSetting;
 		currentState=SETTINGS_SCREEN;
 	}
 }
 
 void performSettingsChoosingAction() {
-	SHUTDOWN_OPTION=0;
-	THEME_OPTION=1;
-	DEFAULT_OPTION=2;
-	APPEARANCE_OPTION=3;
-	SYSTEM_OPTION=4;
-	HELP_OPTION=5;
-
 	if (keys[BTN_UP]) {
 		if(chosenSetting>0) {
 			chosenSetting--;
 		} else {
-			chosenSetting=5;
+			chosenSetting=NUM_OF_MENU_SETTING-1;
 		}
 	} else if (keys[BTN_DOWN]) {
-		if(chosenSetting<5) {
+		if(chosenSetting<NUM_OF_MENU_SETTING-1) {
 			chosenSetting++;
 		} else {
 			chosenSetting=0;
 		}
 	} else if (keys[BTN_LEFT]||keys[BTN_RIGHT]) {
-		if (chosenSetting==SHUTDOWN_OPTION) {
+		if (chosenSetting==ID_MENU_SETTING_SHUTDOWN_OPTION) {
 			if (shutDownEnabled) {
 				selectedShutDownOption=1+selectedShutDownOption*-1;
 			} else {
@@ -892,7 +903,7 @@ void performSettingsChoosingAction() {
 					}
 				}
 			}
-		} else if (chosenSetting==THEME_OPTION) {
+		} else if (chosenSetting==ID_MENU_SETTING_THEME_OPTION) {
 			if (keys[BTN_LEFT]) {
 				if (activeTheme>0) {
 					activeTheme--;
@@ -906,7 +917,38 @@ void performSettingsChoosingAction() {
 					activeTheme=0;
 				}
 			}
-		} else if (chosenSetting==DEFAULT_OPTION) {
+		} else if (chosenSetting == ID_MENU_SETTING_LANGUAGE_OPTION) {
+			if (keys[BTN_LEFT]) {
+				if (activeLang > 0) {
+					activeLang--;
+				} else {
+					activeLang = num_of_langfiles - 1;
+				}
+			} else {
+				if (activeLang < num_of_langfiles - 1) {
+					activeLang++;
+				} else {
+					activeLang = 0;
+				}
+			}
+
+			if (langChanged != activeLang) {
+				langChanged = activeLang;
+				uistring_free();
+				char path_of_languagefile[260];
+				snprintf(path_of_languagefile, sizeof(path_of_languagefile), "%s/.simplemenu/%s.lang", getenv("HOME"), langfiles[activeLang]);
+				FILE *fp = fopen(path_of_languagefile, "rb");
+				uistring_init(fp);
+				
+				if (fp != NULL) {
+					fclose(fp);
+				}
+				
+				char sedcommand[260];
+				snprintf(sedcommand, sizeof(sedcommand), "sed -i '/language_file/c\\language_file = %s' %s/.simplemenu/config.ini", langfiles[activeLang], getenv("HOME"));
+				system(sedcommand);
+			}
+		} else if (chosenSetting==ID_MENU_SETTING_DEFAULT_OPTION) {
 			char command [300];
 			if (shutDownEnabled) {
 				#ifdef TARGET_BITTBOY
@@ -944,17 +986,17 @@ void performSettingsChoosingAction() {
 			}
 			shutDownEnabled=1+shutDownEnabled*-1;
 		}
-	} else if (chosenSetting==SHUTDOWN_OPTION&&keys[BTN_A]) {
+	} else if (chosenSetting==ID_MENU_SETTING_SHUTDOWN_OPTION&&keys[BTN_A]) {
 		running=0;
-	} else if (chosenSetting==HELP_OPTION&&keys[BTN_A]) {
+	} else if (chosenSetting==ID_MENU_SETTING_HELP_OPTION&&keys[BTN_A]) {
 		previouslyChosenSetting=chosenSetting;
 		chosenSetting=0;
 		currentState=HELP_SCREEN_1;
-	} else if (chosenSetting==APPEARANCE_OPTION&&keys[BTN_A]) {
+	} else if (chosenSetting==ID_MENU_SETTING_APPEARANCE_OPTION&&keys[BTN_A]) {
 		previouslyChosenSetting=chosenSetting;
 		chosenSetting=0;
 		currentState=APPEARANCE_SETTINGS;
-	} else if (chosenSetting==SYSTEM_OPTION&&keys[BTN_A]) {
+	} else if (chosenSetting==ID_MENU_SETTING_SYSTEM_OPTION&&keys[BTN_A]) {
 		previouslyChosenSetting=chosenSetting;
 		chosenSetting=0;
 		currentState=SYSTEM_SETTINGS;

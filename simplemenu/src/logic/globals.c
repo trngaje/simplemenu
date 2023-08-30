@@ -87,6 +87,7 @@ int APPEARANCE_OPTION;
 int SYSTEM_OPTION;
 
 char mediaFolder[1000];
+char languagefile[260];
 int stripGames;
 int useCache;
 int shutDownEnabled;
@@ -313,6 +314,7 @@ int BTN_L1;
 int BTN_R1;
 int BTN_L2;
 int BTN_R2;
+int BTN_POWER;
 
 #if defined TARGET_OD || defined TARGET_OD_BETA
  Shake_Device *device;
@@ -339,5 +341,11 @@ int lastMin;
 int lastChargeLevel;
 pthread_t clockThread;
 pthread_mutex_t lock;
+
+/* LANGUAGE */
+char *langfiles[260];
+int activeLang;
+int langChanged;
+int num_of_langfiles;
 
 #endif

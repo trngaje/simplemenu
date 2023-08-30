@@ -15,6 +15,8 @@
 #include "../headers/doubly_linked_rom_list.h"
 #include "../headers/utils.h"
 #include "../headers/system_logic.h"
+#include "../headers/scripts.h"
+#include "../headers/screen.h"
 
 TTF_Font *font = NULL;
 TTF_Font *miniFont = NULL;
@@ -702,9 +704,13 @@ void showRomPreferences() {
 	char *frequency = malloc(10);
 	snprintf(frequency, 10, "%d", CURRENT_SECTION.currentGameNode->data->preferences.frequency);
 
+#if defined(RGNANO) || defined(FUNKEY)
+	int width=calculateProportionalSizeOrDistance1(240);
+	int height = calculateProportionalSizeOrDistance1(72);
+#else
 	int width=calculateProportionalSizeOrDistance1(315);
 	int height = calculateProportionalSizeOrDistance1(72);
-
+#endif
 	//Main rectangle
 	drawRectangleToScreen(width+calculateProportionalSizeOrDistance1(4), height+calculateProportionalSizeOrDistance1(4), SCREEN_WIDTH/2-(width/2+calculateProportionalSizeOrDistance1(2)), SCREEN_HEIGHT/2-(height/2+calculateProportionalSizeOrDistance1(2)), (int[]) {37,50,56});
 
@@ -728,37 +734,37 @@ void showRomPreferences() {
 	drawTextOnScreen(font, NULL, calculateProportionalSizeOrDistance1(6), (SCREEN_HEIGHT/2)-calculateProportionalSizeOrDistance1(28), name, (int[]) {255,255,255}, VAlignMiddle | HAlignLeft, (int[]){}, 0);
 	free(name);
 
-	TTF_SizeUTF8(font, (const char *) "Overclock: " , &textWidth, NULL);
+	TTF_SizeUTF8(font, (const char *) ui_getstring(UI_Overclock__) , &textWidth, NULL);
 	textWidth+=calculateProportionalSizeOrDistance1(2);
 
 	//Frequency option text
-	drawTextOnScreen(font, NULL, (SCREEN_WIDTH/2)-width/2+calculateProportionalSizeOrDistance1(4), (SCREEN_HEIGHT/2)-calculateProportionalSizeOrDistance1(9), "Overclock: ", textColor, VAlignMiddle | HAlignLeft, (int[]){}, 0);
+	drawTextOnScreen(font, NULL, (SCREEN_WIDTH/2)-width/2+calculateProportionalSizeOrDistance1(4), (SCREEN_HEIGHT/2)-calculateProportionalSizeOrDistance1(9), ui_getstring(UI_Overclock__), textColor, VAlignMiddle | HAlignLeft, (int[]){}, 0);
 	//Frequency option value
 #if defined TARGET_OD_BETA || defined TARGET_RFW || defined TARGET_BITTBOY || defined TARGET_PC  || defined MIYOOMINI || defined RGNANO || defined FUNKEY
 	if (CURRENT_SECTION.currentGameNode->data->preferences.frequency==OC_OC_LOW || CURRENT_SECTION.currentGameNode->data->preferences.frequency==OC_OC_HIGH) {
-		drawTextOnScreen(font, NULL, (SCREEN_WIDTH/2)-width/2+textWidth+1, (SCREEN_HEIGHT/2)-calculateProportionalSizeOrDistance1(9), "yes", valueColor, VAlignMiddle | HAlignLeft, (int[]){}, 0);
+		drawTextOnScreen(font, NULL, (SCREEN_WIDTH/2)-width/2+textWidth+1, (SCREEN_HEIGHT/2)-calculateProportionalSizeOrDistance1(9), ui_getstring(UI_yes), valueColor, VAlignMiddle | HAlignLeft, (int[]){}, 0);
 	} else {
-		drawTextOnScreen(font, NULL, (SCREEN_WIDTH/2)-width/2+textWidth+1, (SCREEN_HEIGHT/2)-calculateProportionalSizeOrDistance1(9), "no", valueColor, VAlignMiddle | HAlignLeft, (int[]){}, 0);
+		drawTextOnScreen(font, NULL, (SCREEN_WIDTH/2)-width/2+textWidth+1, (SCREEN_HEIGHT/2)-calculateProportionalSizeOrDistance1(9), ui_getstring(UI_no), valueColor, VAlignMiddle | HAlignLeft, (int[]){}, 0);
 	}
 #else
-	drawTextOnScreen(font, NULL, (SCREEN_WIDTH/2)-width/2+textWidth, (SCREEN_HEIGHT/2)-calculateProportionalSizeOrDistance1(9), "not available", valueColor, VAlignMiddle | HAlignLeft, (int[]){}, 0);
+	drawTextOnScreen(font, NULL, (SCREEN_WIDTH/2)-width/2+textWidth, (SCREEN_HEIGHT/2)-calculateProportionalSizeOrDistance1(9), ui_getstring(UI_not_available), valueColor, VAlignMiddle | HAlignLeft, (int[]){}, 0);
 #endif
 
 	drawRectangleToScreen(width, calculateProportionalSizeOrDistance1(1), SCREEN_WIDTH/2-width/2,SCREEN_HEIGHT/2, problematicGray);
 
 	//Launch at boot option text
-	drawTextOnScreen(font, NULL, (SCREEN_WIDTH/2)-width/2+calculateProportionalSizeOrDistance1(4), (SCREEN_HEIGHT/2)+calculateProportionalSizeOrDistance1(9), "Autostart: ", textColor, VAlignMiddle | HAlignLeft, (int[]){}, 0);
+	drawTextOnScreen(font, NULL, (SCREEN_WIDTH/2)-width/2+calculateProportionalSizeOrDistance1(4), (SCREEN_HEIGHT/2)+calculateProportionalSizeOrDistance1(9), ui_getstring(UI_Autostart__), textColor, VAlignMiddle | HAlignLeft, (int[]){}, 0);
 	//Launch at boot option value
 	if (launchAtBoot) {
-		drawTextOnScreen(font, NULL, (SCREEN_WIDTH/2)-width/2+textWidth, (SCREEN_HEIGHT/2)+calculateProportionalSizeOrDistance1(9), "yes", valueColor, VAlignMiddle | HAlignLeft, (int[]){}, 0);
+		drawTextOnScreen(font, NULL, (SCREEN_WIDTH/2)-width/2+textWidth, (SCREEN_HEIGHT/2)+calculateProportionalSizeOrDistance1(9), ui_getstring(UI_yes), valueColor, VAlignMiddle | HAlignLeft, (int[]){}, 0);
 	} else {
-		drawTextOnScreen(font, NULL, (SCREEN_WIDTH/2)-width/2+textWidth, (SCREEN_HEIGHT/2)+calculateProportionalSizeOrDistance1(9), "no", valueColor, VAlignMiddle | HAlignLeft, (int[]){}, 0);
+		drawTextOnScreen(font, NULL, (SCREEN_WIDTH/2)-width/2+textWidth, (SCREEN_HEIGHT/2)+calculateProportionalSizeOrDistance1(9), ui_getstring(UI_no), valueColor, VAlignMiddle | HAlignLeft, (int[]){}, 0);
 	}
 
 	drawRectangleToScreen(width, calculateProportionalSizeOrDistance1(1), SCREEN_WIDTH/2-width/2,SCREEN_HEIGHT/2+height/4, problematicGray);
 
 	//Emulator option text
-	drawTextOnScreen(font, NULL, (SCREEN_WIDTH/2)-width/2+calculateProportionalSizeOrDistance1(4), (SCREEN_HEIGHT/2)+calculateProportionalSizeOrDistance1(27), "Emulator: ", textColor, VAlignMiddle | HAlignLeft, (int[]){}, 0);
+	drawTextOnScreen(font, NULL, (SCREEN_WIDTH/2)-width/2+calculateProportionalSizeOrDistance1(4), (SCREEN_HEIGHT/2)+calculateProportionalSizeOrDistance1(27), ui_getstring(UI_Emulator__), textColor, VAlignMiddle | HAlignLeft, (int[]){}, 0);
 	//Emulator option value
 	drawTextOnScreen(font, NULL, (SCREEN_WIDTH/2)-width/2+textWidth, (SCREEN_HEIGHT/2)+calculateProportionalSizeOrDistance1(27), emuName, valueColor, VAlignMiddle | HAlignLeft, (int[]){}, 0);
 
@@ -1257,134 +1263,91 @@ void setupHelpScreen(int page) {
 	switch (page) {
 		case 1:
 			options[0]="A";
-#ifdef LANG_KOR
-			values[0]="선택";
-#else
-			values[0]="Confirm";
-#endif
-			options[1]="B";
+			values[0]=ui_getstring(UI_Confirm);
 
-#ifdef LANG_KOR
-			values[1]="취소/기능";
-#else
-			values[1]="Back/Function key";
-#endif
+			options[1]="B";
+			values[1]=ui_getstring(UI_Back_Function_key);
 
 			options[2]="X";
-#ifdef LANG_KOR
-			values[2]="즐겨찾기 표시";
-#else
-			values[2]="Mark favorite";
-#endif
+			values[2]=ui_getstring(UI_Mark_favorite);
 
 			options[3]="Y";
-#ifdef LANG_KOR
-			values[3]="즐겨찾기 리스트로 이동";
-#else
-			values[3]="Show/Hide favorites";
-#endif
+			values[3]=ui_getstring(UI_Show_Hide_favorites);
 
 #if defined TARGET_BITTBOY
 			options[4]="R";
 #else
 			options[4]="R1";
 #endif
+			values[4]=ui_getstring(UI_Fullscreen_mode);
 
-#ifdef LANG_KOR
-			values[4]="전체 화면 모드";
-#else
-			values[4]="Fullscreen mode";
-#endif
-			options[5]="Select";
-#ifdef LANG_KOR
-			values[5]="게임 옵션";
-#else			
-			values[5]="Game options";
-#endif
-			options[6]="Up/Down/Left/Right";
-#ifdef LANG_KOR
-			values[6]="이동";
-#else			
-			values[6]="Scroll";
-#endif
+			options[5]="Select";		
+			values[5]=ui_getstring(UI_Game_options);
+
+			options[6]="Up/Down/Left/Right";		
+			values[6]=ui_getstring(UI_Scroll);
 
 			options[7]="B+Left/Right";
-#ifdef LANG_KOR
-			values[7]="이전/다음 글자";
-#else
-			values[7]="Previous/Next letter";
-#endif		
+			values[7]=ui_getstring(UI_Previous_Next_letter);	
 
 			options[8]="B+Up/Down";
-#ifdef LANG_KOR
-			values[8]="빠른 검색";
-#else
-			values[8]="Quick switch";
-#endif
+			values[8]=ui_getstring(UI_Quick_switch);
+
 			break;
 		case 2:
-			options[0] = "B+Select";
-#ifdef LANG_KOR
-			values[0] = "임의 선택";
-#else		
-			values[0] = "Random select";
-#endif
+			options[0] = "B+Select";	
+			values[0] = ui_getstring(UI_Random_select);
 
 			options[1] = "B+X";
-#ifdef LANG_KOR
-			values[1] = "게임 삭제";
-#else
-			values[1] = "Delete game";
-#endif
+			values[1] = ui_getstring(UI_Delete_game);
+
 			break;
 	}
 
-	char temp[300];
-#ifdef LANG_KOR
-	sprintf(temp,"PAGE %d/2 - 돌아가려면 B를 누르세요", page);
-#else
-	sprintf(temp,"PAGE %d/2 - PRESS B TO RETURN", page);
-#endif
-	hints[0] = temp;
+	if (page == 1)
+		hints[0] = ui_getstring(UI_PAGE_1_2___PRESS_B_TO_RETURN);
+	else
+		hints[0] = ui_getstring(UI_PAGE_2_2___PRESS_B_TO_RETURN);
 }
 
 void setupAppearanceSettings() {
-	options[0]="Tidy rom names ";
+	options[0]=ui_getstring(UI_Tidy_rom_names_);
 	if (stripGames) {
-		values[0] = "enabled";
+		values[0] = ui_getstring(UI_enabled);
 	} else {
-		values[0] = "disabled";
+		values[0] = ui_getstring(UI_disabled);
 	}
-	hints[0] = "CUT DETAILS OUT OF ROM NAMES";
+	hints[0] = ui_getstring(UI_CUT_DETAILS_OUT_OF_ROM_NAMES);
 
-	options[1]="Fullscreen rom names ";
+	options[1] = ui_getstring(UI_Fullscreen_rom_names_);
 	if (footerVisibleInFullscreenMode) {
-		values[1] = "enabled";
+		values[1] = ui_getstring(UI_enabled);
 	} else {
-		values[1] = "disabled";
+		values[1] = ui_getstring(UI_disabled);
 	}
-	hints[1] = "DISPLAY THE CURRENT ROM NAME";
+	hints[1] = ui_getstring(UI_DISPLAY_THE_CURRENT_ROM_NAME);
 
-	options[2]="Fullscreen menu ";
+	options[2] = ui_getstring(UI_Fullscreen_menu_);
 	if (menuVisibleInFullscreenMode) {
-		values[2] = "enabled";
+		values[2] = ui_getstring(UI_enabled);
 	} else {
-		values[2] = "disabled";
+		values[2] = ui_getstring(UI_disabled);
 	}
-	hints[2] = "DISPLAY A TRANSLUCENT MENU";
+	hints[2] = ui_getstring(UI_DISPLAY_A_TRANSLUCENT_MENU);
 }
 
 void setupSystemSettings() {
-	options[0]="Sound ";
-	hints[0] = "PRESS A TO LAUNCH ALSAMIXER";
-
-	options[1]="Brightness ";
-	values[1]=malloc(100);
-	sprintf(values[1],"%d",brightnessValue);
-	hints[1] = "ADJUST BRIGHTNESS LEVEL";
-
-	options[2]="Sharpness ";
-	values[2]=malloc(100);
+#if !defined(RGNANO) && !defined(FUNKEY)
+	options[ID_MENU_SYSTEM_SETTING_VOLUME_OPTION]="Sound ";
+	hints[ID_MENU_SYSTEM_SETTING_VOLUME_OPTION] = "PRESS A TO LAUNCH ALSAMIXER";
+#endif
+	options[ID_MENU_SYSTEM_SETTING_BRIGHTNESS_OPTION] = ui_getstring(UI_Brightness_);
+	values[ID_MENU_SYSTEM_SETTING_BRIGHTNESS_OPTION]=malloc(100);
+	sprintf(values[ID_MENU_SYSTEM_SETTING_BRIGHTNESS_OPTION],"%d",brightnessValue);
+	hints[ID_MENU_SYSTEM_SETTING_BRIGHTNESS_OPTION] = ui_getstring(UI_ADJUST_BRIGHTNESS_LEVEL);
+#if !defined(RGNANO) && !defined(FUNKEY)
+	options[ID_MENU_SYSTEM_SETTING_SHARPNESS_OPTION]="Sharpness ";
+	values[ID_MENU_SYSTEM_SETTING_SHARPNESS_OPTION]=malloc(100);
 //	char *temp = getenv("SDL_VIDEO_KMSDRM_SCALING_SHARPNESS");
 //	if (temp!=NULL) {
 //		sprintf(values[2],"%s",temp);
@@ -1393,129 +1356,114 @@ void setupSystemSettings() {
 //		sharpnessValue=0;
 //		values[2]="0";
 //	}
-	sprintf(values[2],"%d",sharpnessValue);
-	hints[2] = "ADJUST SHARPNESS LEVEL";
-
-	options[3]="Screen timeout ";
-	values[3]=malloc(100);
+	sprintf(values[ID_MENU_SYSTEM_SETTING_SHARPNESS_OPTION],"%d",sharpnessValue);
+	hints[ID_MENU_SYSTEM_SETTING_SHARPNESS_OPTION] = "ADJUST SHARPNESS LEVEL";
+#endif
+	options[ID_MENU_SYSTEM_SETTING_SCREEN_TIMEOUT_OPTION] = ui_getstring(UI_Screen_timeout_);
+	values[ID_MENU_SYSTEM_SETTING_SCREEN_TIMEOUT_OPTION]=malloc(100);
 	if (timeoutValue>0&&hdmiEnabled==0) {
-		sprintf(values[3],"%d",timeoutValue);
+		sprintf(values[ID_MENU_SYSTEM_SETTING_SCREEN_TIMEOUT_OPTION],"%d",timeoutValue);
 	} else {
-		sprintf(values[3],"%s","always on");
+		sprintf(values[ID_MENU_SYSTEM_SETTING_SCREEN_TIMEOUT_OPTION], "%s", ui_getstring(UI_always_on));
 	}
-	hints[3] = "SECONDS UNTIL THE SCREEN TURNS OFF";
-
-	options[4]="Overclocking level";
+	hints[ID_MENU_SYSTEM_SETTING_SCREEN_TIMEOUT_OPTION] = ui_getstring(UI_SECONDS_UNTIL_THE_SCREEN_TURNS_OFF);
+#if !defined(RGNANO) && !defined(FUNKEY)
+	options[ID_MENU_SYSTEM_SETTING_OC_OPTION]="Overclocking level";
 
 #if defined TARGET_OD_BETA || defined TARGET_PC || defined MIYOOMINI || defined RGNANO || defined FUNKEY
 	if (OCValue==OC_OC_LOW) {
-		values[4]="low";
+		values[ID_MENU_SYSTEM_SETTING_OC_OPTION]="low";
 	} else if (OCValue==OC_OC_HIGH){
-		values[4]="high";
+		values[ID_MENU_SYSTEM_SETTING_OC_OPTION]="high";
 	}
 #else
-	values[4]="not available";
+	values[ID_MENU_SYSTEM_SETTING_OC_OPTION]="not available";
 #endif
 
-	hints[4] = "AFFECTS THE ROM MENU OC SETTING";
+	hints[ID_MENU_SYSTEM_SETTING_OC_OPTION] = "AFFECTS THE ROM MENU OC SETTING";
 
-	options[5]="HDMI ";
+	options[ID_MENU_SYSTEM_SETTING_USB_OPTION]="HDMI ";
 #if defined TARGET_RFW || defined TARGET_OD_BETA
-	values[5] = " \0";
+	values[ID_MENU_SYSTEM_SETTING_USB_OPTION] = " \0";
 #else
 	if (hdmiChanged==1) {
-		values[5] = "enabled";
+		values[ID_MENU_SYSTEM_SETTING_USB_OPTION] = "enabled";
 	} else {
-		values[5] = "disabled";
+		values[ID_MENU_SYSTEM_SETTING_USB_OPTION] = "disabled";
 	}
 #endif
 
 #if defined TARGET_RFW
-	hints[5] = "PRESS A TO ENABLE USB";
+	hints[ID_MENU_SYSTEM_SETTING_USB_OPTION] = "PRESS A TO ENABLE USB";
 #elif defined TARGET_OD_BETA
-	hints[5] = "PRESS A TO REBOOT AND ENABLE HDMI";
+	hints[ID_MENU_SYSTEM_SETTING_USB_OPTION] = "PRESS A TO REBOOT AND ENABLE HDMI";
 #else
-	hints[5] = "ENABLE OR DISABLE HDMI";
+	hints[ID_MENU_SYSTEM_SETTING_USB_OPTION] = "ENABLE OR DISABLE HDMI";
+#endif
+
 #endif
 }
 
 void setupSettingsScreen() {
-#ifdef LANG_KOR
-	options[0]="종료 ";
-	hints[0] = "확정은 A - 선택은 LEFT/RIGHT";
-#else
-	options[0]="Session ";
-	hints[0] = "A TO CONFIRM - LEFT/RIGHT TO CHOOSE";
-#endif
+	options[ID_MENU_SETTING_SHUTDOWN_OPTION] = ui_getstring(UI_Session_);
+	hints[ID_MENU_SETTING_SHUTDOWN_OPTION] = ui_getstring(UI_A_TO_CONFIRM___LEFT_RIGHT_TO_CHOOSE);
+
 	if (shutDownEnabled) {
 		switch (selectedShutDownOption) {
 			case 0:
-				values[0] = "shutdown";
+				values[ID_MENU_SETTING_SHUTDOWN_OPTION] = ui_getstring(UI_shutdown);
 				break;
 			case 1:
-				values[0] = "reboot";
+				values[ID_MENU_SETTING_SHUTDOWN_OPTION] = ui_getstring(UI_reboot);
 				break;
 		}
 	} else {
 		switch (selectedShutDownOption) {
 			case 0:
-				values[0] = "quit";
+				values[ID_MENU_SETTING_SHUTDOWN_OPTION] = ui_getstring(UI_quit);
 				break;
 			case 1:
-				values[0] = "reboot";
+				values[ID_MENU_SETTING_SHUTDOWN_OPTION] = ui_getstring(UI_reboot);
 				break;
 			case 2:
-				values[0] = "shutdown";
+				values[ID_MENU_SETTING_SHUTDOWN_OPTION] = ui_getstring(UI_shutdown);
 				break;
 		}
 	}
 
-#ifdef LANG_KOR
-	options[1]="테마 ";
-#else
-	options[1]="Theme ";
-#endif
+	options[ID_MENU_SETTING_THEME_OPTION] = ui_getstring(UI_Theme_);
+
 	char *themeName=getNameWithoutPath((themes[activeTheme]));
-	values[1] = themeName;
-#ifdef LANG_KOR
-	hints[1] = "테마를 선택";
-#else
-	hints[1] = "LAUNCHER THEME";
-#endif
+	values[ID_MENU_SETTING_THEME_OPTION] = themeName;
+	hints[ID_MENU_SETTING_THEME_OPTION] = ui_getstring(UI_LAUNCHER_THEME);
 
-#ifdef LANG_KOR
-	options[2]="기본 실행 ";
-#else
-	options[2]="Default launcher ";
-#endif
-	if (shutDownEnabled) {
-		values[2] = "yes";
-	} else {
-		values[2] = "no";
+	options[ID_MENU_SETTING_LANGUAGE_OPTION] = ui_getstring(UI_Language);
+	if (num_of_langfiles > 0) {
+		values[ID_MENU_SETTING_LANGUAGE_OPTION] = langfiles[activeLang];
 	}
-#ifdef LANG_KOR
-	hints[2] = "부팅 후 실행";
+	else {
+		values[ID_MENU_SETTING_LANGUAGE_OPTION] = "<none>";
+	}
+	hints[ID_MENU_SETTING_LANGUAGE_OPTION] = "select a language";
 
-	options[3]="외형 ";
-	hints[3] = "외형 옵션";
+	options[ID_MENU_SETTING_DEFAULT_OPTION] = ui_getstring(UI_Default_launcher_);
 
-	options[4]="시스템 ";
-	hints[4] = "시스템 옵션";
+	if (shutDownEnabled) {
+		values[ID_MENU_SETTING_DEFAULT_OPTION] = ui_getstring(UI_yes);
+	} else {
+		values[ID_MENU_SETTING_DEFAULT_OPTION] = ui_getstring(UI_no);
+	}
 
-	options[5]="도움말 ";
-	hints[5] = "이 메뉴를 사용하는 방법";
-#else
-	hints[2] = "LAUNCH AFTER BOOTING";
+	hints[ID_MENU_SETTING_DEFAULT_OPTION] = ui_getstring(UI_LAUNCH_AFTER_BOOTING);
 
-	options[3]="Appearance ";
-	hints[3] = "APPEARANCE OPTIONS";
+	options[ID_MENU_SETTING_APPEARANCE_OPTION] = ui_getstring(UI_Appearance_);
+	hints[ID_MENU_SETTING_APPEARANCE_OPTION] = ui_getstring(UI_APPEARANCE_OPTIONS);
 
-	options[4]="System ";
-	hints[4] = "SYSTEM OPTIONS";
+	options[ID_MENU_SETTING_SYSTEM_OPTION] = ui_getstring(UI_System_);
+	hints[ID_MENU_SETTING_SYSTEM_OPTION] = ui_getstring(UI_SYSTEM_OPTIONS);
 
-	options[5]="Help ";
-	hints[5] = "HOW TO USE THIS MENU";
-#endif
+	options[ID_MENU_SETTING_HELP_OPTION] = ui_getstring(UI_Help_);
+	hints[ID_MENU_SETTING_HELP_OPTION] = ui_getstring(UI_HOW_TO_USE_THIS_MENU);
 }
 
 
@@ -1589,47 +1537,37 @@ void updateScreen(struct Node *node) {
 			case SETTINGS_SCREEN:
 				clearOptionsValuesAndHints();
 				setupSettingsScreen();
-#ifdef LANG_KOR
-				drawSpecialScreen("설정", options, values, hints, 1);
-#else
-				drawSpecialScreen("SETTINGS", options, values, hints, 1);
-#endif
+
+				drawSpecialScreen(ui_getstring(UI_SETTINGS), options, values, hints, 1);
+
 				break;
 			case HELP_SCREEN_1:
 				clearOptionsValuesAndHints();
 				setupHelpScreen(1);
-#ifdef LANG_KOR
-				drawSpecialScreen("도움말", options, values, hints, 0);
-#else
-				drawSpecialScreen("HELP", options, values, hints, 0);
-#endif
+
+				drawSpecialScreen(ui_getstring(UI_HELP), options, values, hints, 0);
+
 				break;
 			case HELP_SCREEN_2:
 				clearOptionsValuesAndHints();
 				setupHelpScreen(2);
-#ifdef LANG_KOR
-				drawSpecialScreen("도움말", options, values, hints, 0);
-#else
-				drawSpecialScreen("HELP", options, values, hints, 0);
-#endif
+
+				drawSpecialScreen(ui_getstring(UI_HELP), options, values, hints, 0);
+
 				break;
 			case APPEARANCE_SETTINGS:
 				clearOptionsValuesAndHints();
 				setupAppearanceSettings();
-#ifdef LANG_KOR
-				drawSpecialScreen("외형", options, values, hints, 1);
-#else
-				drawSpecialScreen("APPEARANCE", options, values, hints, 1);
-#endif
+
+				drawSpecialScreen(ui_getstring(UI_APPEARANCE), options, values, hints, 1);
+
 				break;
 			case SYSTEM_SETTINGS:
 				clearOptionsValuesAndHints();
 				setupSystemSettings();
-#ifdef LANG_KOR
-				drawSpecialScreen("시스템", options, values, hints, 1);
-#else
-				drawSpecialScreen("SYSTEM", options, values, hints, 1);
-#endif
+
+				drawSpecialScreen(ui_getstring(UI_SYSTEM), options, values, hints, 1);
+
 				break;
 			case CHOOSING_GROUP:
 				showCurrentGroup();
@@ -1788,10 +1726,11 @@ void freeResources() {
 	Shake_Close(device);
 	Shake_Quit();
 #endif
-#ifndef TARGET_PC
-	closeLogFile();
-#endif
-	SDL_Quit();
+//#ifndef TARGET_PC
+//	closeLogFile();
+//#endif
+
+	//SDL_Quit();
 }
 
 

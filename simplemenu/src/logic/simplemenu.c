@@ -19,6 +19,9 @@
 #include "../headers/system_logic.h"
 #include "../headers/utils.h"
 
+#if defined(RGNANO) || defined(FUNKEY)
+#include "../headers/fk_menu.h"
+#endif
 
 void initializeGlobals() {
 	running=1;
@@ -60,6 +63,61 @@ void sig_term_handler()
 	running=0;
 }
 
+#if defined(RGNANO) || defined(FUNKEY)
+#define SHELL_CMD_POWERDOWN                 "powerdown"
+#define SHELL_CMD_POWERDOWN_HANDLE          "powerdown handle"
+
+/* Quick save and turn off the console */
+static void quick_poweroff()
+{
+    FILE *fp;
+
+    /* Send command to cancel any previously scheduled powerdown */
+    fp = popen(SHELL_CMD_POWERDOWN_HANDLE, "r");
+    if (fp == NULL)
+    {
+        /* Countdown is still ticking, so better do nothing
+		   than start writing and get interrupted!
+		*/
+	    printf("Failed to cancel scheduled shutdown\n");
+		exit(0);
+    } else {
+        pclose(fp);
+    }
+
+    /* Perform Instant Play save and shutdown */
+    execlp(SHELL_CMD_POWERDOWN, SHELL_CMD_POWERDOWN);
+
+    /* Should not be reached */
+    printf("Failed to perform shutdown\n");
+
+    /* Exit Emulator */
+    exit(0);
+}
+
+/* Handler for SIGUSR1, caused by closing the console */
+static void handle_sigusr1(int sig)
+{
+    printf("Caught signal USR1 %d\n", sig);
+
+    /* Exit menu if it was launched */
+    //FunkeyMenu::stop();
+
+    /** Poweroff */
+    quick_poweroff();
+}
+
+static void set_handler(int signal, void (*handler)(int))
+{
+	struct sigaction sig;
+	sigaction(signal, NULL, &sig);
+	sig.sa_handler = handler;
+	sig.sa_flags |= SA_RESTART;
+	sigaction(signal, &sig, NULL);
+}
+
+#endif
+
 void initialSetup(int w, int h) {
 	initializeGlobals();
 	logMessage("INFO","initialSetup","Initialized Globals");
@@ -72,6 +130,11 @@ void initialSetup(int w, int h) {
 	sigaction(SIGABRT, &sa, NULL);
 	sigaction(SIGINT, &sa, NULL);
 	signal(SIGTERM, &sig_term_handler);
+	
+	#if defined(RGNANO) || defined(FUNKEY)
+	set_handler(SIGUSR1, &handle_sigusr1);
+	#endif
+	
 	#if defined(TARGET_NPG) || defined(TARGET_OD) || defined TARGET_OD_BETA
 	resetFrameBuffer();
 	#endif
@@ -266,6 +329,10 @@ void processEvents() {
 #else
 	initialSetup(320,240);
 #endif
+
+#if defined(RGNANO) || defined(FUNKEY)
+	FK_InitMenu();
+#endif
 	logMessage("INFO","main","Setup 2");
 	initialSetup2();
 	logMessage("INFO","main","Checking launch at boot");
@@ -304,6 +371,11 @@ void processEvents() {
 			SDL_Delay(FRAME_DURATION_IN_MILLISECONDS-timeSpent);
 		}
 	}
+	
+#if defined(RGNANO) || defined(FUNKEY)
+	FK_EndMenu();
+#endif
+
 	int notDefaultButTryingToRebootOrShutDown = (shutDownEnabled==0&&(selectedShutDownOption==1||selectedShutDownOption==2));
 	if(shutDownEnabled||notDefaultButTryingToRebootOrShutDown) {
 		currentState=SHUTTING_DOWN;

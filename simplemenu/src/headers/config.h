@@ -1,6 +1,7 @@
 #include "../headers/globals.h"
 #ifndef CONFIG
 #define CONFIG
+
 void saveLastState();
 void loadLastState();
 void saveFavorites();
@@ -22,4 +23,7 @@ void setRunningFlag();
 void loadRomPreferences(struct Rom *rom);
 int wasRunningFlag();
 void createThemesInHomeIfTheyDontExist();
+void checkLangfiles(const char *config_langname);
+void config_ini_set_value(const char *name, const char *value);
+
 #endif

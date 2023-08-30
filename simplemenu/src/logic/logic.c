@@ -191,6 +191,9 @@ void generateError(char *pErrorMessage, int pThereIsACriticalError) {
 }
 
 void quit() {
+	char temp[200];
+	sprintf(temp, "shutDownEnabled=%d, selectedShutDownOption=%d", shutDownEnabled, selectedShutDownOption);
+	logMessage("INFO", "quit", temp);
 	saveLastState();
 	saveFavorites();
 	clearTimer();
@@ -198,20 +201,21 @@ void quit() {
 	clearPicModeHideMenuTimer();
 	clearBatteryTimer();
 	freeResources();
+	atexit(SDL_Quit);
 	if (shutDownEnabled) {
 #ifdef TARGET_PC
 		exit(0);
 #endif
 		if (selectedShutDownOption == 1) {
-			execlp("sh", "sh", "-c", "sync && reboot", NULL);
+			execlp("/bin/sh", "sh", "-c", "sync && reboot", NULL);
 		} else {
-			execlp("sh", "sh", "-c", "sync && poweroff", NULL);
+			execlp("/bin/sh", "sh", "-c", "sync && poweroff", NULL);
 		}
 	} else {
 		if (selectedShutDownOption == 1) {
-			execlp("sh", "sh", "-c", "sync && reboot", NULL);
+			execlp("/bin/sh", "sh", "-c", "sync && reboot", NULL);
 		} else if (selectedShutDownOption == 2) {
-			execlp("sh", "sh", "-c", "sync && poweroff", NULL);
+			execlp("/bin/sh", "sh", "-c", "sync && poweroff", NULL);
 		} else {
 			exit(0);
 		}
@@ -337,6 +341,7 @@ void executeCommand(char *emulatorFolder, char *executable,	char *fileToBeExecut
 	logMessage("INFO", "executeCommand", fileToBeExecutedWithFullPath);
 	SDL_ShowCursor(1);
 	freeResources();
+	SDL_Quit();
 #ifndef TARGET_OD_BETA
 	resetFrameBuffer1();
 #endif
